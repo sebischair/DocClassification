@@ -25,3 +25,6 @@ From the command prompt execute
 or use run.bat  
 
 Application will be available at localhost:9000
+
+# Note
+If you wish to use a standalone spark server: update the spark configuration in file SparkSingleton.java
