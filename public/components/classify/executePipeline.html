@@ -1,0 +1,38 @@
+<div class="container">
+    <div class="row">
+        <h1>Classify documents</h1>
+        <b>Pipeline: {{vm.pipeline.name}}</b>
+        <hr />
+        <div>
+            <label>Directory: </label>
+            <input class="form-control" type="text" ng-model="vm.documentsPath" required ng-trim="true" />
+        </div>
+        <br />
+        <div>
+            <button type="button" class="btn btn-primary" ng-click="vm.classifyDocuments()">Classify</button>
+            <br />
+            <div ng-if="vm.message.length > 0" class="alert alert-danger" role="alert">
+                <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                <span class="sr-only">Error:</span>
+                {{vm.message}}
+            </div>
+        </div>
+
+        <br />
+        <div ng-if="vm.showResults === true" class="jumbotron">
+            <h1>Results of document classification</h1>
+            <table class="table">
+                <tr>
+                    <th>Text</th>
+                    <th>Label</th>
+                </tr>
+                <tr ng-repeat="row in vm.results">
+                    <td>{{row.text | limitTo: 50}} ...</td>
+                    <td>{{row.prediction}}</td>
+                </tr>
+            </table>
+
+        </div>
+
+    </div>
+</div>

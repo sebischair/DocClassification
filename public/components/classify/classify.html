@@ -1,0 +1,19 @@
+<div class="container">
+    <div class="row">
+        <div ng-if="vm.pipelines.length > 0">
+            <h1>Select a pipeline</h1>
+            <table class="table">
+                <tr>
+                    <th>Pipeline name</th>
+                    <th>Created at</th>
+                    <th>Model path</th>
+                </tr>
+                <tr ng-repeat="pipeline in vm.pipelines">
+                    <td><a href="/executePipeline/{{pipeline.name}}">{{pipeline.name}}</a></td>
+                    <td>{{pipeline.createdAt.$date | date: 'yyyy-MM-dd HH:mm'}}</td>
+                    <td>{{pipeline.modelPath}}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>

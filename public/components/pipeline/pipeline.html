@@ -1,0 +1,34 @@
+<div class="container">
+    <div class="row">
+        <h1>Create new pipeline</h1>
+        <div>
+            <label>Pipeline name:</label>
+            <input type="text" ng-model="vm.pipelineName" ng-minlength=3 required ng-trim="true" />
+            <button type="button" class="btn btn-primary" ng-click="vm.createPipeline()">Save</button>
+            <br />
+            <div ng-if="vm.message.length > 0" class="alert alert-danger" role="alert">
+                <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                <span class="sr-only">Error:</span>
+                {{vm.message}}
+            </div>
+        </div>
+        <hr />
+        <div ng-if="vm.pipelines.length > 0">
+            <h1>Select a pipeline</h1>
+            <table class="table">
+                <tr>
+                    <th>Pipeline name</th>
+                    <th>Created at</th>
+                    <th></th>
+                </tr>
+                <tr ng-repeat="pipeline in vm.pipelines">
+                    <td><a href="/configurePipeline/{{pipeline.name}}">{{pipeline.name}}</a></td>
+                    <td>{{pipeline.createdAt.$date | date: 'yyyy-MM-dd HH:mm'}}</td>
+                    <td><span class="glyphicon glyphicon-remove" ng-click="vm.removePipeline(pipeline.name)"></span></td>
+                </tr>
+            </table>
+        </div>
+
+        </div>
+    </div>
+</div>
