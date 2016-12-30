@@ -1,10 +1,37 @@
 <div class="container">
     <div class="row">
-        <div class="col-md-10">
+        <div class="col-md-8">
             <h1>Pipeline: {{vm.pipeline.name}}</h1>
         </div>
-        <div class="col-md-2" style="padding-top: 25px">
-            <button type="button" class="btn btn-default" ng-click="vm.newLabel()"> + New Label</button>
+        <div class="col-md-4" style="padding-top: 25px">
+            <button type="button" class="btn btn-primary" ng-click="vm.newLabel()"> + New Label</button>
+            <button type="button" class="btn btn-primary" ng-click="vm.linkSC()" data-toggle="collapse" data-target="#selectWorkspace" aria-expanded="false" aria-controls="selectWorkspace">
+                Link to SocioCortex workspace
+            </button>
+        </div>
+    </div>
+
+    <div id="selectWorkspace" class="collapse">
+        <div class="well">
+            Workspace:
+            <select name="workspaceSelect" id="workspaceSelect" ng-model="vm.workspace" ng-change="vm.getPages()">
+                <option ng-repeat="option in vm.workspaces" value="{{option.id}}">{{option.name}}</option> <br />
+            </select>
+            <div ng-if='vm.workspace != ""'>
+                <hr/>
+                <p><b>Select entity types</b></p>
+                <p ng-repeat="page in vm.pages">
+                    <input type="checkbox" checklist-model="vm.selectedPages" checklist-value="page"> {{page.name}}
+                </p>
+            </div>
+            <div ng-if='vm.selectedPages.length > 0'>
+                <button type="button" class="btn btn-primary" ng-click="vm.updateLabels()">Update Labels</button>
+            </div>
+            <div align="right">
+                <button type="button" class="btn btn-default" data-toggle="collapse" data-target="#selectWorkspace">
+                    Close
+                </button>
+            </div>
         </div>
     </div>
 
@@ -45,7 +72,7 @@
             <tr ng-repeat="label in vm.pipeline.labels">
                 <td>{{label.name}}</td>
                 <td>{{label.path}}</td>
-                <td><span class="glyphicon glyphicon-remove" ng-click="vm.removeLabel(label.name, label.path)"></span></td>
+                <td><span class="glyphicon glyphicon-remove" ng-click="vm.removeLabel(label)"></span></td>
             </tr>
         </table>
     </div>

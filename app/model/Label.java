@@ -9,12 +9,16 @@ import org.mongodb.morphia.annotations.Embedded;
 public class Label {
     private String name;
     private String path;
+    private String labelId;
+    private String type;
 
     public Label() {};
 
-    public Label(String name, String path) {
+    public Label(String name, String path, String labelId, String type) {
         this.name = name;
         this.path = path;
+        this.labelId = labelId;
+        this.type = type;
     }
 
     public String getName() {
@@ -27,6 +31,14 @@ public class Label {
 
     public String getPath() {
         return path;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public String getLabelId() {
+        return labelId;
     }
 
     public void setPath(String path) {

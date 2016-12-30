@@ -77,10 +77,11 @@ pipelineApp.controller('PipelineCtrl', ['pipelines', '$http', '$location', funct
 
 }]);
 
-pipelineApp.controller('ConfigurePipelineCtrl', ['pipeline', '$http', function(pipeline, $http) {
+pipelineApp.controller('ConfigurePipelineCtrl', ['scAuth', 'scData', 'scModel', 'pipeline', '$http', function(scAuth, scData, scModel, pipeline, $http) {
     var self = this;
     self.pipeline = JSON.parse(pipeline.result);
     self.createLabelFlag = false;
+    self.workspace = "";
 
     self.newLabel = function() {
         self.createLabelFlag = true;
@@ -100,7 +101,7 @@ pipelineApp.controller('ConfigurePipelineCtrl', ['pipeline', '$http', function(p
         } else {
             for(var i in self.pipeline.labels) {
                 if(self.pipeline.labels[i].name === self.labelName) {
-                    self.message = "Please use a different name! Pipeline already exists";
+                    self.message = "Please use a different name! Label already exists";
                     return;
                 }
             }
@@ -109,7 +110,8 @@ pipelineApp.controller('ConfigurePipelineCtrl', ['pipeline', '$http', function(p
             data.pipelineName = self.pipeline.name;
             data.labelName = self.labelName;
             data.labelPath = self.labelPath;
-
+            data.labelId = self.labelName;
+            data.labelType = "customType";
             //add a new label
             $http.post('/label/create', data).
             then(function(response) {
@@ -121,12 +123,14 @@ pipelineApp.controller('ConfigurePipelineCtrl', ['pipeline', '$http', function(p
         }
     };
 
-    self.removeLabel = function(labelName, labelPath) {
+    self.removeLabel = function(label) {
         //remove a label
         var data = {};
         data.pipelineName = self.pipeline.name;
-        data.labelName = labelName;
-        data.labelPath = labelPath;
+        data.labelName = label.name;
+        data.labelPath = label.path;
+        data.labelId = label.labelId;
+        data.labelType = label.type;
 
         $http.post('/label/remove', data).
         then(function(response) {
@@ -153,6 +157,43 @@ pipelineApp.controller('ConfigurePipelineCtrl', ['pipeline', '$http', function(p
                 self.cmatrix[self.pipeline.labels[i].name] = arr;
             }
             self.showResults = true;
+        });
+    }
+
+    self.linkSC = function() {
+        scAuth.login("manoj5864@gmail.com", "@Sebis5864");
+        scData.Workspace.query(function (workspaces) {
+            self.workspaces = workspaces;
+        });
+    }
+
+    self.getPages = function() {
+        self.pages = [];
+        scData.Workspace.get({ id: self.workspace}, function (workspace) {
+            scData.Entity.get({id: workspace.rootEntity.id}, function(entity) {
+                entity.children.forEach(function(subpage) {
+                    if(subpage.name.indexOf(".") < 0) {
+                        self.pages.push(subpage);
+                    }
+                });
+            });
+        });
+    }
+
+    self.updateLabels = function() {
+        self.selectedPages.forEach(function(type) {
+            var data = {};
+            data.pipelineName = self.pipeline.name;
+            data.labelName = type.name;
+            data.labelPath = type.href;
+            data.labelId = type.id;
+            data.labelType = "sociocortexType";
+
+            //add a new label
+            $http.post('/label/create', data).
+            then(function(response) {
+                self.pipeline = JSON.parse(response.data.result);
+            });
         });
     }
 

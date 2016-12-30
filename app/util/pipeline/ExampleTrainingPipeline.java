@@ -38,7 +38,10 @@ public class ExampleTrainingPipeline extends TrainingPipeline {
         List<Label> labels = pipeline.getLabels();
         for(int i=0; i<labels.size(); i++) {
             labelMap.put(i, labels.get(i).getName());
-            data.addAll(StaticFunctions.getRDDs(this.getSparkContext(), labels.get(i).getPath(), i).collect());
+            if(labels.get(i).getType() == "customType")
+                data.addAll(StaticFunctions.getRDDs(this.getSparkContext(), labels.get(i).getPath(), i).collect());
+            else
+                data.addAll(StaticFunctions.getRDDsFromHref(this.getSparkContext(), labels.get(i).getPath(), i).collect());
         }
     }
 

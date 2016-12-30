@@ -15,8 +15,12 @@ import org.apache.spark.mllib.linalg.Matrix;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.RowFactory;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import play.libs.Json;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -73,6 +77,40 @@ public class StaticFunctions {
 //        System.out.format("Weighted false positive rate = %f\n", metrics.weightedFalsePositiveRate());
 
         return result;
+    }
+
+    public static JavaRDD<Row> getRDDsFromHref(JavaSparkContext sparkContext, String path, double label) {
+        try {
+            //get all files in this path
+            HttpURLConnection connection = RestCaller.connectionForGetRequest(path + "/files");
+            String output = RestCaller.outputForConnection(connection);
+            System.out.println("Status: " + connection.getResponseCode() + " - " + RestCaller.responseCodeDisplayForCode(connection.getResponseCode()));
+            JSONArray newArray = new JSONArray(output);
+            for(int i=0;i<newArray.length(); i++) {
+                JSONObject jo = newArray.getJSONObject(i);
+                //RestCaller.saveFile(jo.getString("href")+ "/content", jo.getString("name"), label);
+                connection = RestCaller.connectionForGetRequest(jo.getString("href")+ "/content");
+                RestCaller.saveFile(connection, jo.getString("name"), label);
+                System.out.println("File saved");
+            }
+
+            JavaPairRDD<String, String> logData = sparkContext.wholeTextFiles(play.Play.application().path().getAbsolutePath()+"/tmp/"+label).cache();
+            return logData.values().map(new Function<String, Row>() {
+                @Override
+                public Row call(String s) throws Exception {
+                    return RowFactory.create(label, s);
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            /*try {
+                FileUtils.deleteDirectory(new File(play.Play.application().path().getAbsolutePath()+"/tmp/"+label));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }*/
+        }
+        return null;
     }
 
     public static JavaRDD<Row> getRDDs(JavaSparkContext sparkContext, String dir, double label) {

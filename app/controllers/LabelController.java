@@ -16,9 +16,11 @@ public class LabelController extends Controller {
         String pipelineName = request().body().asJson().get("pipelineName").asText();
         String labelName = request().body().asJson().get("labelName").asText();
         String labelPath = request().body().asJson().get("labelPath").asText();
+        String labelId = request().body().asJson().get("labelId").asText();
+        String labelType = request().body().asJson().get("labelType").asText();
 
         ObjectNode result = Json.newObject();
-        if(new Pipeline().addNewLabel(pipelineName, labelName, labelPath)) {
+        if(new Pipeline().addNewLabel(pipelineName, labelName, labelPath, labelId, labelType)) {
             result.put("status", "OK");
             result.put("result", StaticFunctions.deserializeToJSON(StaticFunctions.getPipeline(pipelineName)));
         } else {
@@ -32,9 +34,11 @@ public class LabelController extends Controller {
         String pipelineName = request().body().asJson().get("pipelineName").asText();
         String labelName = request().body().asJson().get("labelName").asText();
         String labelPath = request().body().asJson().get("labelPath").asText();
+        String labelId = request().body().asJson().get("labelId").asText();
+        String labelType = request().body().asJson().get("labelType").asText();
 
         ObjectNode result = Json.newObject();
-        if(new Pipeline().removeLabel(pipelineName, labelName, labelPath)) {
+        if(new Pipeline().removeLabel(pipelineName, labelName, labelPath, labelId, labelType)) {
             result.put("status", "OK");
             result.put("result", StaticFunctions.deserializeToJSON(StaticFunctions.getPipeline(pipelineName)));
         } else {

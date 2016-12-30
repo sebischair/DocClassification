@@ -55,9 +55,9 @@ public class Pipeline extends  PersistentEntity {
         return false;
     }
 
-    public boolean addNewLabel(String pipelineName, String labelName, String labelPath) {
+    public boolean addNewLabel(String pipelineName, String labelName, String labelPath, String labelId, String labelType) {
         try {
-            Label label = new Label(labelName, labelPath);
+            Label label = new Label(labelName, labelPath, labelId, labelType);
             Query<Pipeline> query = (Query<Pipeline>) MorphiaObject.datastore.createQuery(this.getClass()).field("name").equalIgnoreCase(pipelineName);
             UpdateOperations<Pipeline> ops = (UpdateOperations<Pipeline>) MorphiaObject.datastore.createUpdateOperations(this.getClass()).add("labels", label, false);
             MorphiaObject.datastore.update(query, ops);
@@ -68,9 +68,9 @@ public class Pipeline extends  PersistentEntity {
         return false;
     }
 
-    public boolean removeLabel(String pipelineName, String labelName, String labelPath) {
+    public boolean removeLabel(String pipelineName, String labelName, String labelPath, String labelId, String labelType) {
         try {
-            Label label = new Label(labelName, labelPath);
+            Label label = new Label(labelName, labelPath, labelId, labelType);
             Query<Pipeline> query = (Query<Pipeline>) MorphiaObject.datastore.createQuery(this.getClass()).field("name").equalIgnoreCase(pipelineName);
             UpdateOperations<Pipeline> ops = (UpdateOperations<Pipeline>) MorphiaObject.datastore.createUpdateOperations(this.getClass()).removeAll("labels", label);
             MorphiaObject.datastore.update(query, ops);

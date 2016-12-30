@@ -1,10 +1,13 @@
 'use strict';
 
 angular.module('cApp', [
+    'sociocortex',
     'ngRoute',
+    'ngStorage',
     'ui.bootstrap',
     'cApp.pipeline',
-    'cApp.classify'
+    'cApp.classify',
+    'checklist-model'
 ])
 .config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
     $routeProvider

@@ -12,6 +12,9 @@ libraryDependencies ++= Seq(
   javaJdbc,
   cache,
   javaWs,
+  "commons-httpclient" % "commons-httpclient" % "3.1",
+  "org.apache.httpcomponents" % "fluent-hc" % "4.5.2",
+  "org.json" % "json" % "20160810",
   "org.apache.spark" % "spark-core_2.11" % "2.0.1",
   "org.apache.spark" % "spark-sql_2.11" % "2.0.1",
   "org.apache.spark" % "spark-mllib_2.11" % "2.0.1",
@@ -20,8 +23,12 @@ libraryDependencies ++= Seq(
   "org.webjars" % "bootstrap" % "3.3.6",
   "org.webjars" % "html5shiv" % "3.7.3",
   "org.mongodb.morphia" % "morphia" % "1.2.1",
-  "org.webjars" % "angularjs" % "1.5.8",
-  "org.webjars" % "angular-ui-bootstrap" % "1.3.3"
+  "org.webjars.bower" % "angular" % "1.6.1",
+  //"org.webjars.bower" % "angular-ui-bootstrap" % "2.3.0",
+  "org.webjars.bower" % "ngstorage" % "0.3.11",
+  "org.webjars.bower" % "angular-resource" % "1.6.1",
+  "org.webjars.bower" % "angular-checklist-model" % "0.10.0",
+  "org.webjars.bower" % "angular-route" % "1.6.1"
 )
 
 dependencyOverrides ++= Set(

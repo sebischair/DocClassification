@@ -1,23 +1,12 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.junit.Test;
+import util.RestCaller;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import org.junit.*;
+import java.io.IOException;
+import java.net.HttpURLConnection;
 
-import play.mvc.*;
-import play.test.*;
-import play.data.DynamicForm;
-import play.data.validation.ValidationError;
-import play.data.validation.Constraints.RequiredValidator;
-import play.i18n.Lang;
-import play.libs.F;
-import play.libs.F.*;
-import play.twirl.api.Content;
-
-import static play.test.Helpers.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 
 /**
@@ -27,6 +16,9 @@ import static org.junit.Assert.*;
  *
  */
 public class ApplicationTest {
+    public static final String API_BASE_URL = "https://server.sociocortex.com/api/v1/";
+    public static final String API_USERNAME = "manoj5864@gmail.com";
+    public static final String API_PASSWORD = "@Sebis5864";
 
     @Test
     public void simpleCheck() {
@@ -35,11 +27,20 @@ public class ApplicationTest {
     }
 
     @Test
-    public void renderTemplate() {
-        Content html = views.html.index.render("Your new application is ready.");
-        assertEquals("text/html", html.contentType());
-        assertTrue(html.body().contains("Your new application is ready."));
-    }
+    public void testRestCall() {
+        try {
+            HttpURLConnection connection = RestCaller.connectionForGetRequest("entities/ose32apj5pa9/files");
+            System.out.println("Status: " + connection.getResponseCode() + " - " + RestCaller.responseCodeDisplayForCode(connection.getResponseCode()));
+            String output = RestCaller.outputForConnection(connection);
+            JSONArray newArray = new JSONArray(output);
 
+            for(int i=0;i<newArray.length(); i++) {
+                JSONObject jo = newArray.getJSONObject(i);
+                RestCaller.saveFile(jo.getString("href")+ "/content", jo.getString("name"), 0.2);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 }
