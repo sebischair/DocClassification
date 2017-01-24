@@ -158,14 +158,14 @@ pipelineApp.controller('ConfigurePipelineCtrl', ['scAuth', 'scData', 'scModel', 
             }
             self.showResults = true;
         });
-    }
+    };
 
     self.linkSC = function() {
         scAuth.login("manoj5864@gmail.com", "@Sebis5864");
         scData.Workspace.query(function (workspaces) {
             self.workspaces = workspaces;
         });
-    }
+    };
 
     self.getPages = function() {
         self.pages = [];
@@ -178,7 +178,7 @@ pipelineApp.controller('ConfigurePipelineCtrl', ['scAuth', 'scData', 'scModel', 
                 });
             });
         });
-    }
+    };
 
     self.updateLabels = function() {
         self.selectedPages.forEach(function(type) {
@@ -195,6 +195,5 @@ pipelineApp.controller('ConfigurePipelineCtrl', ['scAuth', 'scData', 'scModel', 
                 self.pipeline = JSON.parse(response.data.result);
             });
         });
-    }
-
+    };
 }]);

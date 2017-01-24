@@ -1,5 +1,6 @@
 package util;
 
+import com.github.axet.wget.WGet;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -184,7 +185,7 @@ public class RestCaller {
      */
     public static JSONObject postWorkspace(String workspaceName) {
         try {
-            HttpURLConnection connection = connectionForPostRequest("workspaces");
+            HttpURLConnection connection = connectionForPostRequest("workspaces", "POST");
 
             JSONObject newWorkspace = new JSONObject();
             newWorkspace.put("name", workspaceName);
@@ -214,7 +215,7 @@ public class RestCaller {
      */
     public static JSONObject postType(String name, String namePlural, JSONObject aWorkspace) {
         try {
-            HttpURLConnection connection = connectionForPostRequest("types");
+            HttpURLConnection connection = connectionForPostRequest("types", "POST");
 
             JSONObject newType = new JSONObject();
             newType.put("name", name);
@@ -249,7 +250,7 @@ public class RestCaller {
      */
     public static JSONObject postEntity(String anEntityName, JSONObject aWorkspace, JSONObject aType, JSONArray attributes) {
         try {
-            HttpURLConnection connection = connectionForPostRequest("entities");
+            HttpURLConnection connection = connectionForPostRequest("entities", "POST");
 
             JSONObject newEntity = new JSONObject();
             newEntity.put("name", anEntityName);
@@ -280,7 +281,7 @@ public class RestCaller {
 
     public static JSONObject postProperty(String aPropertyName, JSONObject aType) {
         try {
-            HttpURLConnection connection = connectionForPostRequest(aType.getString("uid") + "/properties");
+            HttpURLConnection connection = connectionForPostRequest(aType.getString("uid") + "/properties", "POST");
 
             JSONObject newEntity = new JSONObject();
             newEntity.put("name", aPropertyName);
@@ -477,7 +478,7 @@ public class RestCaller {
                 ioe.printStackTrace();
             }
         }
-
+        output = connection.getURL().getPath().replace("/content", " ---- ") + output;
         File file = new File(play.Play.application().path().getAbsolutePath() + "/tmp/"+folderName+"/"+fileName);
         try {
             FileUtils.writeStringToFile(file, output);
@@ -486,39 +487,14 @@ public class RestCaller {
         }
     }
 
-    public static void saveFile(String request, String fileName, double folderName) {
+    public static void saveFile(String requestUrl, String fileName, double folderName) {
         try {
             Authenticator.setDefault(new CustomAuthenticator());
-            URL url = new URL(API_BASE_URL + (request == null ? "" : request));
-            File file = new File(play.Play.application().path().getAbsolutePath() + "/tmp/"+folderName+"/"+fileName);
-
-            //URL website = new URL(API_BASE_URL + (request == null ? "" : request));
-            //ReadableByteChannel rbc = Channels.newChannel(website.openStream());
-            //FileOutputStream fos = new FileOutputStream(new File(play.Play.application().path().getAbsolutePath() + "/tmp/"+folderName+"/"+fileName));
-            //fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-
-            /*if (!Files.exists(Paths.get(play.Play.application().path().getAbsolutePath() + "/tmp/"+folderName))) {
-                try {
-                    Files.createDirectories(Paths.get(play.Play.application().path().getAbsolutePath() + "/tmp/"+folderName));
-                } catch (IOException ioe) {
-                    ioe.printStackTrace();
-                }
-            }
-
-            try (InputStream in = website.openStream()) {
-                Files.copy(in, Paths.get(play.Play.application().path().getAbsolutePath() + "/tmp/"+folderName+"/"+fileName), StandardCopyOption.REPLACE_EXISTING);
-            }*/
-
-            //FileUtils.copyURLToFile(url, file);
-
-
-            Downloader downloader = new Downloader();
-
-            downloader.download(url, file);
-
+            URL url = new URL(API_BASE_URL + (requestUrl == null ? "" : requestUrl));
+            File target = new File(play.Play.application().path().getAbsolutePath() + "/tmp/"+folderName+"/"+fileName);
+            WGet w = new WGet(url, target);
+            w.download();
         } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -618,15 +594,20 @@ public class RestCaller {
      * @param request : A request String. Will be appended to the API_BASE_URL, "/" as prefix is not needed/allowed
      * @return an connection of type HttpURLConnection, null if error occurs
      */
-    public static HttpURLConnection connectionForPostRequest(String request) {
+    public static HttpURLConnection connectionForPostRequest(String request, String requestMethod) {
         try {
-            URL url = new URL(API_BASE_URL + (request == null ? "" : request));
+            URL url;
+            if(request.contains(API_BASE_URL)) {
+                url = new URL(request);
+            } else {
+                url = new URL(API_BASE_URL + (request == null ? "" : request));
+            }
             HttpURLConnection connection = (HttpURLConnection)url.openConnection();
             String login = "username:password";
             String userpass = API_USERNAME + ":" + API_PASSWORD;
             String basicAuth = "Basic " + javax.xml.bind.DatatypeConverter.printBase64Binary(userpass.getBytes());
             connection.setRequestProperty("Authorization", basicAuth);
-            connection.setRequestMethod("POST");
+            connection.setRequestMethod(requestMethod);
             connection.setRequestProperty("Content-Type", "application/json");
             connection.setDoOutput(true);
 
@@ -759,6 +740,43 @@ public class RestCaller {
             ja = new JSONArray(rawString);
             return ja;
         } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Move a file to a different entity.
+     * @param filePath
+     * @param entityId
+     * @return
+     */
+    public static JSONObject moveFile(String filePath, String entityId) {
+        try {
+            System.out.println(filePath);
+            HttpURLConnection connection = connectionForPostRequest(filePath, "PUT");
+
+            String fileId = filePath.split("files/")[1];
+            JSONObject post = new JSONObject();
+            post.put("id", fileId);
+
+            JSONObject entity = new JSONObject();
+            entity.put("id", entityId);
+            post.put("entity", entity);
+
+            OutputStream os = connection.getOutputStream();
+            os.write(post.toString().getBytes());
+            os.flush();
+
+            System.out.println("Status: " + connection.getResponseCode() + " - " + responseCodeDisplayForCode(connection.getResponseCode()));
+            String output = outputForConnection(connection);
+            System.out.println(output);
+
+            JSONObject newObject = new JSONObject(output);
+            connection.disconnect();
+
+            return newObject;
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;

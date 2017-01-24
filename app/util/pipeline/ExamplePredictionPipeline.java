@@ -24,7 +24,11 @@ public class ExamplePredictionPipeline extends PredictionPipeline {
     Dataset<Row> dataset = null;
 
     public void loadDocuments(String documentsPath) {
-        data.addAll(StaticFunctions.getRDDs(this.getSparkContext(), documentsPath).collect());
+        if(documentsPath.contains("http") || documentsPath.contains("https")) {
+            data.addAll(StaticFunctions.getRDDsFromHref(this.getSparkContext(), documentsPath, -1).collect());
+        } else {
+            data.addAll(StaticFunctions.getRDDs(this.getSparkContext(), documentsPath, -1).collect());
+        }
     }
 
     @Override

@@ -8,6 +8,7 @@ GET     /                       controllers.HomeController.index
 
 GET     /pipeline/train         controllers.PipelineController.train(name: String ?= "")
 POST    /pipeline/predict       controllers.PipelineController.predict
+POST    /pipeline/predictAndClassify       controllers.PipelineController.predictAndClassify
 
 
 GET     /pipeline/create        controllers.PipelineController.create(name: String ?= "")

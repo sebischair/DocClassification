@@ -15,6 +15,7 @@ libraryDependencies ++= Seq(
   "commons-httpclient" % "commons-httpclient" % "3.1",
   "org.apache.httpcomponents" % "fluent-hc" % "4.5.2",
   "org.json" % "json" % "20160810",
+  "com.github.axet" % "wget" % "1.4.3",
   "org.apache.spark" % "spark-core_2.11" % "2.0.1",
   "org.apache.spark" % "spark-sql_2.11" % "2.0.1",
   "org.apache.spark" % "spark-mllib_2.11" % "2.0.1",

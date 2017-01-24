@@ -1,15 +1,42 @@
 <div class="container">
     <div class="row">
-        <h1>Classify documents</h1>
-        <b>Pipeline: {{vm.pipeline.name}}</b>
-        <hr />
-        <div>
-            <label>Directory: </label>
-            <input class="form-control" type="text" ng-model="vm.documentsPath" required ng-trim="true" />
+        <div class="row">
+            <h1>Classify documents</h1>
+            <b>Pipeline: {{vm.pipeline.name}}</b>
+            <hr />
         </div>
-        <br />
-        <div>
-            <button type="button" class="btn btn-primary" ng-click="vm.classifyDocuments()">Classify</button>
+
+        <div class="row">
+            <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#selectDirectory" aria-expanded="false" aria-controls="selectDirectory">
+                Path to a directory
+            </button>
+            <button type="button" class="btn btn-primary" ng-click="vm.linkSC()" data-toggle="collapse" data-target="#selectWorkspace" aria-expanded="false" aria-controls="selectWorkspace">
+                Link SocioCortex workspace
+            </button>
+            <br />
+        </div>
+
+        <div class="row">
+            <div id="selectDirectory" class="collapse">
+                <div class="well">
+                    <label>Path to a directory: </label>
+                    <input class="form-control" type="text" ng-model="vm.documentsPath" required ng-trim="true" />
+                </div>
+            </div>
+
+            <div id="selectWorkspace" class="collapse">
+                <div class="well">
+                    Workspace:
+                    <select name="workspaceSelect" id="workspaceSelect" ng-model="vm.workspace" ng-change="vm.linkWorkspace()">
+                        <option ng-repeat="option in vm.workspaces" value="{{option.id}}">{{option.name}}</option> <br />
+                    </select>
+                </div>
+            </div>
+            <br />
+        </div>
+
+        <div class="row">
+            <button ng-if="vm.waitForSc === false" type="button" class="btn btn-danger" ng-click="vm.classifyDocuments()">Classify</button>
             <br />
             <div ng-if="vm.message.length > 0" class="alert alert-danger" role="alert">
                 <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
@@ -19,8 +46,8 @@
         </div>
 
         <br />
-        <div ng-if="vm.showResults === true" class="jumbotron">
-            <h1>Results of document classification</h1>
+        <div ng-if="vm.showResults === true" class="row">
+            <h2>Results of document classification</h2>
             <table class="table">
                 <tr>
                     <th>Text</th>
@@ -28,9 +55,15 @@
                 </tr>
                 <tr ng-repeat="row in vm.results">
                     <td>{{row.text | limitTo: 50}} ...</td>
-                    <td>{{row.prediction}}</td>
+                    <td>{{vm.pipeline.labels[row.prediction].name}}</td>
                 </tr>
             </table>
+            <div ng-if='vm.workspace !== ""' class="row">
+                <button type="button" class="btn btn-danger" ng-click="vm.updateFilesInSC()">Update Files in SocioCortex</button>
+            </div>
+            <div class="alert" ng-if="self.updateComplete">
+                Files were successfully updated in SocioCortex.
+            </div>
 
         </div>
 

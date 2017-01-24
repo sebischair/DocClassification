@@ -81,34 +81,43 @@ public class StaticFunctions {
 
     public static JavaRDD<Row> getRDDsFromHref(JavaSparkContext sparkContext, String path, double label) {
         try {
-            //get all files in this path
-            HttpURLConnection connection = RestCaller.connectionForGetRequest(path + "/files");
-            String output = RestCaller.outputForConnection(connection);
-            System.out.println("Status: " + connection.getResponseCode() + " - " + RestCaller.responseCodeDisplayForCode(connection.getResponseCode()));
-            JSONArray newArray = new JSONArray(output);
-            for(int i=0;i<newArray.length(); i++) {
-                JSONObject jo = newArray.getJSONObject(i);
-                //RestCaller.saveFile(jo.getString("href")+ "/content", jo.getString("name"), label);
+            if(path.contains("files")) {
+                //get the file in the path
+                HttpURLConnection connection = RestCaller.connectionForGetRequest(path);
+                String output = RestCaller.outputForConnection(connection);
+                System.out.println("Status: " + connection.getResponseCode() + " - " + RestCaller.responseCodeDisplayForCode(connection.getResponseCode()));
+                JSONObject jo = new JSONObject(output);
                 connection = RestCaller.connectionForGetRequest(jo.getString("href")+ "/content");
                 RestCaller.saveFile(connection, jo.getString("name"), label);
                 System.out.println("File saved");
+            } else {
+                //get all files in this path
+                HttpURLConnection connection = RestCaller.connectionForGetRequest(path + "/files");
+                String output = RestCaller.outputForConnection(connection);
+                System.out.println("Status: " + connection.getResponseCode() + " - " + RestCaller.responseCodeDisplayForCode(connection.getResponseCode()));
+                JSONArray newArray = new JSONArray(output);
+                for(int i=0;i<newArray.length(); i++) {
+                    JSONObject jo = newArray.getJSONObject(i);
+                    //RestCaller.saveFile(jo.getString("href")+ "/content", jo.getString("name"), label);
+                    connection = RestCaller.connectionForGetRequest(jo.getString("href")+ "/content");
+                    RestCaller.saveFile(connection, jo.getString("name"), label);
+                    System.out.println("Files saved");
+                }
             }
 
             JavaPairRDD<String, String> logData = sparkContext.wholeTextFiles(play.Play.application().path().getAbsolutePath()+"/tmp/"+label).cache();
             return logData.values().map(new Function<String, Row>() {
                 @Override
                 public Row call(String s) throws Exception {
-                    return RowFactory.create(label, s);
+                    if(label != -1) {
+                        return RowFactory.create(label, s);
+                    } else {
+                        return RowFactory.create(s);
+                    }
                 }
             });
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            /*try {
-                FileUtils.deleteDirectory(new File(play.Play.application().path().getAbsolutePath()+"/tmp/"+label));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }*/
         }
         return null;
     }
@@ -118,17 +127,11 @@ public class StaticFunctions {
         return logData.values().map(new Function<String, Row>() {
             @Override
             public Row call(String s) throws Exception {
-                return RowFactory.create(label, s);
-            }
-        });
-    }
-
-    public static JavaRDD<Row> getRDDs(JavaSparkContext sparkContext, String dir) {
-        JavaPairRDD<String, String> logData = sparkContext.wholeTextFiles(dir).cache();
-        return logData.values().map(new Function<String, Row>() {
-            @Override
-            public Row call(String s) throws Exception {
-                return RowFactory.create(s);
+                if(label != -1) {
+                    return RowFactory.create(label, s);
+                } else {
+                    return RowFactory.create(s);
+                }
             }
         });
     }
