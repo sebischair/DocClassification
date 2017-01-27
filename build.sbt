@@ -9,6 +9,7 @@ scalaVersion := "2.11.7"
 lazy val webJarsPlay = file("..").getAbsoluteFile.toURI
 
 libraryDependencies ++= Seq(
+  filters,
   javaJdbc,
   cache,
   javaWs,
