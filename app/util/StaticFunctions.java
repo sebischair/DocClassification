@@ -18,6 +18,7 @@ import org.apache.spark.sql.RowFactory;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import play.libs.Json;
+import play.mvc.Result;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -162,5 +163,9 @@ public class StaticFunctions {
 
     public static Pipeline getPipeline(String pipelineName) {
         return (Pipeline) new Pipeline().findByName("name", pipelineName);
+    }
+
+    public static Result jsonResult(Result httpResponse) {
+        return httpResponse.as("application/json; charset=utf-8");
     }
 }

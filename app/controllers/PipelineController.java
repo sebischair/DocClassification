@@ -128,7 +128,7 @@ public class PipelineController extends Controller {
 
         results.put("result", result);
         cleanUpTempFolder();
-        return ok(results);
+        return StaticFunctions.jsonResult(ok(results));
     }
 
     private void cleanUpTempFolder() {
