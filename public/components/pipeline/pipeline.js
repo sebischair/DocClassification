@@ -83,6 +83,9 @@ pipelineApp.controller('ConfigurePipelineCtrl', ['scAuth', 'scData', 'scModel', 
     self.createLabelFlag = false;
     self.workspace = "";
 
+    self.typeCheckBox = null;
+    self.pageCheckBox = null;
+
     self.newLabel = function() {
         self.createLabelFlag = true;
     };
@@ -169,6 +172,7 @@ pipelineApp.controller('ConfigurePipelineCtrl', ['scAuth', 'scData', 'scModel', 
 
     self.getPages = function() {
         self.pages = [];
+        self.attributeType = "Page";
         scData.Workspace.get({ id: self.workspace}, function (workspace) {
             scData.Entity.get({id: workspace.rootEntity.id}, function(entity) {
                 entity.children.forEach(function(subpage) {
@@ -178,22 +182,92 @@ pipelineApp.controller('ConfigurePipelineCtrl', ['scAuth', 'scData', 'scModel', 
                 });
             });
         });
+
+        self.types= [];
+        scData.Workspace.getEntityTypes({ id: self.workspace}, function (types) {
+            self.types = types;
+        });
     };
 
-    self.updateLabels = function() {
-        self.selectedPages.forEach(function(type) {
-            var data = {};
-            data.pipelineName = self.pipeline.name;
-            data.labelName = type.name;
-            data.labelPath = type.href;
-            data.labelId = type.id;
-            data.labelType = "sociocortexType";
+    self.getAttributes = function(type) {
+        self.attributes= [];
+        scModel.EntityType.getAttributeDefinitions({ id: type.id}, function (attributes) {
+            self.attributes = attributes;
+        });
+    };
 
-            //add a new label
-            $http.post('/label/create', data).
-            then(function(response) {
-                self.pipeline = JSON.parse(response.data.result);
+    self.getAttributeValues = function(attributeId) {
+        self.values = [];
+        self.attributeType = null;
+        scModel.AttributeDefinition.get({id: attributeId}, function(attribute) {
+            self.label = attribute.name;
+            if(attribute.attributeType === "Boolean") {
+                self.attributeType = "Boolean";
+                self.values = [0, 1];
+            } else if(attribute.attributeType === "Link"){
+                self.attributeType = "Link";
+                var linkedId = attribute.options.entityType.id;
+                scModel.EntityType.getEntities({id: linkedId}, function(entities) {
+                    entities.forEach(function(entity) {
+                       self.values.push(entity);
+                    });
+                })
+            }
+        });
+    }
+
+    self.updateLabels = function() {
+        if(self.attributeType === "Page") {
+            self.selectedPages.forEach(function(page) {
+                var data = {};
+                data.pipelineName = self.pipeline.name;
+                data.labelName = page.name;
+                data.labelPath = page.href;
+                data.labelId = page.id;
+                data.labelType = "Page";
+
+                //add a new label
+                $http.post('/label/create', data).
+                then(function(response) {
+                    self.pipeline = JSON.parse(response.data.result);
+                });
             });
+        } else {
+            self.selectedValues.forEach(function(value) {
+                var data = {};
+                data.pipelineName = self.pipeline.name;
+                data.label = self.label;
+
+                var miningAttr = [];
+                self.selectedAttributesForMining.forEach(function(attr) {
+                   miningAttr.push(attr.name);
+                });
+                data.miningAttributes = miningAttr;
+
+                if(self.attributeType === "Boolean") {
+                    data.labelName = value;
+                    data.labelPath = self.selectedTypes[0].href;
+                    data.labelId = self.selectedTypes[0].id;
+                    data.labelType = "Boolean";
+                } else {
+                    data.labelName = value.name;
+                    data.labelPath = self.selectedTypes[0].href;
+                    data.labelId = self.selectedTypes[0].id;
+                    data.labelType = "Link";
+                }
+                //add a new label
+                $http.post('/label/create', data).
+                then(function(response) {
+                    self.pipeline = JSON.parse(response.data.result);
+                });
+            });
+        }
+    };
+
+    self.updateSelection = function(position, entities) {
+        angular.forEach(entities, function(subscription, index) {
+            if (position != index)
+                subscription.checked = false;
         });
     };
 }]);

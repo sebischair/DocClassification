@@ -91,6 +91,7 @@ public abstract class TrainingPipeline {
 
     public void setTrainingData(Dataset<Row> trainingData) {
         this.trainingData = trainingData;
+        this.trainingData.cache();
     }
 
     public Dataset<Row> getTestingData() {
@@ -99,6 +100,7 @@ public abstract class TrainingPipeline {
 
     public void setTestingData(Dataset<Row> testingData) {
         this.testingData = testingData;
+        this.testingData.cache();
     }
 
     public PipelineModel getModel() {

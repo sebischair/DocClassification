@@ -8,10 +8,7 @@ import org.apache.spark.ml.classification.OneVsRest;
  */
 public class DefaultOneVsRest {
     public static OneVsRest get() {
-        LogisticRegression classifier = new LogisticRegression()
-                .setMaxIter(10)
-                .setTol(1E-6)
-                .setFitIntercept(true);
+        LogisticRegression classifier = new LogisticRegression().setMaxIter(100).setTol(0.1).setStandardization(true).setFitIntercept(true);
 
         return new OneVsRest().setClassifier(classifier);
     }

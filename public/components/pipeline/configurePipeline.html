@@ -10,28 +10,67 @@
             </button>
         </div>
     </div>
-
     <div id="selectWorkspace" class="collapse">
-        <div class="well">
-            Workspace:
-            <select name="workspaceSelect" id="workspaceSelect" ng-model="vm.workspace" ng-change="vm.getPages()">
-                <option ng-repeat="option in vm.workspaces" value="{{option.id}}">{{option.name}}</option> <br />
-            </select>
-            <div ng-if='vm.workspace != ""'>
-                <hr/>
-                <p><b>Select entity types</b></p>
-                <p ng-repeat="page in vm.pages">
-                    <input type="checkbox" checklist-model="vm.selectedPages" checklist-value="page"> {{page.name}}
-                </p>
+        <b>Select a Workspace</b>
+        <select name="workspaceSelect" id="workspaceSelect" ng-model="vm.workspace" ng-change="vm.getPages()">
+            <option ng-repeat="option in vm.workspaces" value="{{option.id}}">{{option.name}}</option> <br />
+        </select>
+        <div>
+            <br />
+            <span><input type="checkbox" ng-model="vm.typeCheckBox"><b>Select Types</b></span> OR
+            <span><input type="checkbox" ng-model="vm.pageCheckBox"><b>Select Pages</b></span><br /><br />
+        </div>
+
+        <div ng-if="vm.typeCheckBox">
+            <div ng-if='vm.workspace != "" && vm.typeCheckBox'>
+                <div class="row">
+                    <div class="col-md-12"><b>Select Types</b></div>
+                    <div class="col-md-2" ng-repeat="type in vm.types">
+                        <input type="checkbox" checklist-model="vm.selectedTypes" checklist-value="type" ng-click="updateSelection($index, entities)" ng-change="vm.getAttributes(type)"> {{type.name}}
+                    </div><br />
+                </div>
+
+                <div ng-if='vm.selectedTypes.length == 1'>
+                    <div class="row">
+                        <div class="col-md-12"><b>Select attributes for mining</b></div>
+                        <div class="col-md-2" ng-repeat="attribute in vm.attributes">
+                            <input type="checkbox" checklist-model="vm.selectedAttributesForMining" checklist-value="attribute"> {{attribute.name}}
+                        </div><br />
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12"><b>Select an attribute for labeling</b></div>
+                        <div class="col-md-2" ng-repeat="attribute in vm.attributes">
+                            <input type="checkbox" checklist-model="vm.selectedAttributes" checklist-value="attribute" ng-click="updateSelection($index, entities)" ng-change="vm.getAttributeValues(attribute.id)"> {{attribute.name}}
+                        </div><br /><br />
+                    </div>
+
+                    <div ng-if='vm.selectedAttributes.length == 1'>
+                        <div class="col-md-12"><b>Select attribute values as labels</b></div>
+                        <div class="row">
+                            <div class="col-md-2" ng-if='vm.attributeType=="Boolean"' ng-repeat="value in vm.values">
+                                <input type="checkbox" checklist-model="vm.selectedValues" checklist-value="value"> {{value}}
+                            </div>
+                            <div class="col-md-2" ng-if='vm.attributeType=="Link"' ng-repeat="value in vm.values">
+                                <input type="checkbox" checklist-model="vm.selectedValues" checklist-value="value"> {{value.name}}
+                            </div><br />
+                        </div>
+                        <button type="button" class="btn btn-primary" ng-click="vm.updateLabels()">Update Labels</button>
+                    </div>
+                </div>
             </div>
-            <div ng-if='vm.selectedPages.length > 0'>
-                <button type="button" class="btn btn-primary" ng-click="vm.updateLabels()">Update Labels</button>
-            </div>
-            <div align="right">
-                <button type="button" class="btn btn-default" data-toggle="collapse" data-target="#selectWorkspace">
-                    Close
-                </button>
-            </div>
+        </div>
+        <div ng-if='vm.workspace != "" && vm.pageCheckBox'>
+            <p><b>Select Pages</b></p>
+            <p ng-repeat="page in vm.pages">
+                <input type="checkbox" checklist-model="vm.selectedPages" checklist-value="page"> {{page.name}}
+            </p>
+        </div>
+        <div ng-if='vm.selectedPages.length > 0'>
+            <button type="button" class="btn btn-primary" ng-click="vm.updateLabels()">Update Labels</button>
+        </div>
+        <div align="right">
+            <button type="button" class="btn btn-default" data-toggle="collapse" data-target="#selectWorkspace">Close</button>
         </div>
     </div>
 
@@ -42,7 +81,7 @@
                 <input type="text" class="form-control" ng-model="vm.labelName" required ng-trim="true" />
 
                 <br />
-                <label>Directory path:</label>
+                <label>Label path:</label>
                 <input type="text" class="form-control" ng-model="vm.labelPath" required ng-trim="true" />
             </div>
             <br />
@@ -59,9 +98,8 @@
         </div>
     </div>
 
-    <hr />
-
     <div ng-if="vm.pipeline.labels.length > 0">
+        <hr />
         <h1>Document labels</h1>
         <table class="table">
             <tr>
@@ -77,11 +115,10 @@
         </table>
     </div>
 
-    <hr />
     <div ng-if="vm.pipeline.labels.length > 0">
+        <hr />
         <button type="button" class="btn btn-primary" ng-click="vm.trainDocuments()">Train documents</button>
     </div>
-
     <br />
     <div ng-if="vm.showResults === true" class="jumbotron">
         <h2> Prediction results on test data</h2>

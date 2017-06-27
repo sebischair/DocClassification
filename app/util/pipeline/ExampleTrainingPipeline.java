@@ -7,6 +7,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.spark.ml.PipelineStage;
 import org.apache.spark.ml.classification.OneVsRest;
 import org.apache.spark.ml.feature.HashingTF;
+import org.apache.spark.ml.feature.NGram;
 import org.apache.spark.ml.feature.Tokenizer;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -37,12 +38,16 @@ public class ExampleTrainingPipeline extends TrainingPipeline {
     public void loadDocuments(Pipeline pipeline) {
         List<Label> labels = pipeline.getLabels();
         for(int i=0; i<labels.size(); i++) {
-            labelMap.put(i, labels.get(i).getName());
+            Label label = labels.get(i);
+            labelMap.put(i, label.getName());
+            /*
             if(labels.get(i).getType() == "customType")
-                data.addAll(StaticFunctions.getRDDs(this.getSparkContext(), labels.get(i).getPath(), i).collect());
+                data.addAll(StaticFunctions.getRDDs(this.getSparkContext(), label.getPath(), i).collect());
             else
-                data.addAll(StaticFunctions.getRDDsFromHref(this.getSparkContext(), labels.get(i).getPath(), i).collect());
+                data.addAll(StaticFunctions.getRDDsFromHref(this.getSparkContext(), label, i, pipeline).collect());
+            */
         }
+        data = StaticFunctions.getRDDsFromHref(this.getSparkContext(), labels, pipeline);
     }
 
     @Override
@@ -54,7 +59,8 @@ public class ExampleTrainingPipeline extends TrainingPipeline {
         });
 
         Dataset<Row> dataset = this.getSqlContext().createDataFrame(data, schema);
-        Dataset<Row>[] splits = dataset.randomSplit(new double[]{0.9, 0.1});
+        dataset.repartition(3);
+        Dataset<Row>[] splits = dataset.randomSplit(new double[]{0.7, 0.3});
         this.setTrainingData(splits[0]);
         this.setTestingData(splits[1]);
     }
@@ -63,7 +69,8 @@ public class ExampleTrainingPipeline extends TrainingPipeline {
     public void setStages() {
         Tokenizer tokenizer = DefaultTokenizer.get();
         //Word2Vec word2vec = new DefaultWord2Vec().get(tokenizer);
-        //NGram ng = new NGram().setInputCol(tokenizer.getOutputCol()).setOutputCol("rawFeatures").setN(3);
+        //Stemmer stemmed = new Stemmer().setInputCol(tokenizer.getOutputCol()).setOutputCol("stemmed").setLanguage("English");
+        NGram ng = new NGram().setInputCol(tokenizer.getOutputCol()).setOutputCol("rawFeatures").setN(3);
         HashingTF hashingTF = DefaultHashingTF.get(tokenizer.getOutputCol(), 10000);
         //LogisticRegression lr = new DefaultLogisticRegression().get();
         //DecisionTreeClassifier dtc = DefaultDecisionTreeClassifier.get();
@@ -73,7 +80,7 @@ public class ExampleTrainingPipeline extends TrainingPipeline {
         //LDA lda = new LDA().setK(10).setMaxIter(10);
         OneVsRest ovr = new DefaultOneVsRest().get();
         //RandomForestClassifier rfc = new DefaultRandomForestClassifier().get();
-        this.getPipeline().setStages(new PipelineStage[]{tokenizer, hashingTF, ovr});
+        this.getPipeline().setStages(new PipelineStage[]{tokenizer, ng, hashingTF, ovr});
     }
 
     @Override

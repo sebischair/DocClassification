@@ -30,7 +30,9 @@ libraryDependencies ++= Seq(
   "org.webjars.bower" % "ngstorage" % "0.3.11",
   "org.webjars.bower" % "angular-resource" % "1.6.1",
   "org.webjars.bower" % "angular-checklist-model" % "0.10.0",
-  "org.webjars.bower" % "angular-route" % "1.6.1"
+  "org.webjars.bower" % "angular-route" % "1.6.1",
+  "org.apache.lucene" % "lucene-analyzers-common" % "6.4.1",
+  "nz.ac.waikato.cms.weka" % "weka-stable" % "3.8.1"
 )
 
 dependencyOverrides ++= Set(

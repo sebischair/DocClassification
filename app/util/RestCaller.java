@@ -29,8 +29,8 @@ import java.util.HashMap;
  */
 public class RestCaller {
     public static final String API_BASE_URL = "https://server.sociocortex.com/api/v1/";
-    public static final String API_USERNAME = "manoj5864@gmail.com";
-    public static final String API_PASSWORD = "@Sebis5864";
+    public static final String API_USERNAME = "";
+    public static final String API_PASSWORD = "";
 
     // GET REQUESTS
 
@@ -66,7 +66,6 @@ public class RestCaller {
         connection.disconnect();
     }
 
-
     public static void printOutTypesForWorkspace(String aWorkspaceUid) throws IOException{
         HttpURLConnection connection = connectionForGetRequest(aWorkspaceUid+"/types");
         System.out.println("Status: " + connection.getResponseCode() + " - " + responseCodeDisplayForCode(connection.getResponseCode()));
@@ -74,7 +73,6 @@ public class RestCaller {
         System.out.println(output);
         connection.disconnect();
     }
-
 
     /**
      * Get the workspace as JSONObject by searching for it's uid
@@ -278,7 +276,6 @@ public class RestCaller {
         return null;
     }
 
-
     public static JSONObject postProperty(String aPropertyName, JSONObject aType) {
         try {
             HttpURLConnection connection = connectionForPostRequest(aType.getString("uid") + "/properties", "POST");
@@ -305,7 +302,6 @@ public class RestCaller {
         }
         return null;
     }
-
 
     // DELETE FUNCTIONS
 
@@ -464,8 +460,6 @@ public class RestCaller {
         }
         return null;
     }
-
-
 
     // BASIC HELPER-FUNCTIONS TO ACCESS AND READOUT DATA
 

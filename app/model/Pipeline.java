@@ -6,6 +6,7 @@ import org.mongodb.morphia.annotations.*;
 import org.mongodb.morphia.query.Query;
 import org.mongodb.morphia.query.UpdateOperations;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -26,11 +27,15 @@ public class Pipeline extends  PersistentEntity {
 
     private List<String> stages;
 
+    private List<String> miningAttributes;
+
     private int split;
 
     private String modelPath;
 
     private Date createdAt;
+
+    private String tag;
 
     public Pipeline() { }
 
@@ -81,6 +86,31 @@ public class Pipeline extends  PersistentEntity {
         return false;
     }
 
+    public boolean updateMiningAttributes(String pipelineName, ArrayList<String> miningAttributes) {
+        try {
+            Query<Pipeline> query = (Query<Pipeline>) MorphiaObject.datastore.createQuery(this.getClass()).field("name").equalIgnoreCase(pipelineName);
+            UpdateOperations<Pipeline> ops = (UpdateOperations<Pipeline>) MorphiaObject.datastore.createUpdateOperations(this.getClass()).set("miningAttributes", miningAttributes);
+            MorphiaObject.datastore.update(query, ops);
+            return true;
+        } catch (Exception exp) {
+            exp.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean updateLabel(String pipelineName, String tag) {
+        try {
+            Query<Pipeline> query = (Query<Pipeline>) MorphiaObject.datastore.createQuery(this.getClass()).field("name").equalIgnoreCase(pipelineName);
+            UpdateOperations<Pipeline> ops = (UpdateOperations<Pipeline>) MorphiaObject.datastore.createUpdateOperations(this.getClass()).set("tag", tag);
+            MorphiaObject.datastore.update(query, ops);
+            return true;
+        } catch (Exception exp) {
+            exp.printStackTrace();
+        }
+        return false;
+
+    }
+
     public String getName() {
         return name;
     }
@@ -119,5 +149,21 @@ public class Pipeline extends  PersistentEntity {
 
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public List<String> getMiningAttributes() {
+        return miningAttributes;
+    }
+
+    public void setMiningAttributes(List<String> miningAttributes) {
+        this.miningAttributes = miningAttributes;
+    }
+
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
     }
 }
