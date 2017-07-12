@@ -29,8 +29,8 @@ import java.util.HashMap;
  */
 public class RestCaller {
     public static final String API_BASE_URL = "https://server.sociocortex.com/api/v1/";
-    public static final String API_USERNAME = "";
-    public static final String API_PASSWORD = "";
+    public static final String API_USERNAME = "manoj5864@gmail.com";
+    public static final String API_PASSWORD = "@Sebis5864";
 
     // GET REQUESTS
 

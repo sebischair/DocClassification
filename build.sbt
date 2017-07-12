@@ -32,8 +32,8 @@ libraryDependencies ++= Seq(
   "org.webjars.bower" % "angular-checklist-model" % "0.10.0",
   "org.webjars.bower" % "angular-route" % "1.6.1",
   "org.apache.lucene" % "lucene-analyzers-common" % "6.4.1",
-  "nz.ac.waikato.cms.weka" % "weka-stable" % "3.8.1"
-)
+  "nz.ac.waikato.cms.weka" % "weka-stable" % "3.8.1",
+  "nz.ac.waikato.cms.weka" % "LibSVM" % "1.0.10")
 
 dependencyOverrides ++= Set(
   "com.fasterxml.jackson.core" % "jackson-core" % "2.6.5",

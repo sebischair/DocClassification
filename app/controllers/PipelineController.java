@@ -1,12 +1,11 @@
 package controllers;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import model.Label;
+import com.google.inject.Inject;
 import model.Pipeline;
 import org.apache.commons.io.FileUtils;
 import play.libs.Json;
+import play.libs.ws.WSClient;
 import play.mvc.Controller;
 import play.mvc.Result;
 import util.RestCaller;
@@ -18,12 +17,13 @@ import util.pipeline.ExampleTrainingPipeline;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Created by mahabaleshwar on 10/26/2016.
  */
 public class PipelineController extends Controller {
+    @Inject
+    WSClient ws;
 
     public Result get(String name) {
         ObjectNode result = Json.newObject();
@@ -78,25 +78,21 @@ public class PipelineController extends Controller {
         ObjectNode results = Json.newObject();
         Pipeline pipeline = StaticFunctions.getPipeline(pipelineName);
 
-        ObjectNode result = new ExampleTrainingPipeline().execute(pipeline);
+        String result = new ExampleTrainingPipeline(ws).run(pipeline);
         results.put("status", "OK");
         results.put("result", result);
-
-        String model_path = "sparkModels/" + pipelineName;
-        new Pipeline().updateModelPath(pipelineName, model_path);
 
         return ok(results);
     }
 
     public Result predict() {
-        SparkSingleton.getInstance();
         ObjectNode results = Json.newObject();
         String pipelineName = request().body().asJson().get("pipelineName").asText();
-        String documentsPath = request().body().asJson().get("documentsPath").asText();
+        String text = request().body().asJson().get("text").asText();
         Pipeline pipeline = StaticFunctions.getPipeline(pipelineName);
+        String result = new ExamplePredictionPipeline().execute(pipeline, text);
 
         results.put("status", "OK");
-        ArrayNode result = new ExamplePredictionPipeline().execute(pipeline, documentsPath);
         results.put("result", result);
         cleanUpTempFolder();
         return ok(results);
@@ -111,9 +107,9 @@ public class PipelineController extends Controller {
         Pipeline pipeline = StaticFunctions.getPipeline(pipelineName);
 
         results.put("status", "OK");
-        ArrayNode result = new ExamplePredictionPipeline().execute(pipeline, filePath);
+        String result = new ExamplePredictionPipeline().execute(pipeline, filePath);
 
-        for(int i=0; i<result.size(); i++) {
+        /*for(int i=0; i<result.size(); i++) {
             JsonNode r = result.get(i);
             List<Label> labels = pipeline.getLabels();
             if(labels.size() > 0 && r.has("prediction") && labels.size() >= r.get("prediction").asInt()) {
@@ -124,7 +120,7 @@ public class PipelineController extends Controller {
                 System.out.println(entityId);
                 System.out.println("....................");
             }
-        }
+        }*/
 
         results.put("result", result);
         cleanUpTempFolder();

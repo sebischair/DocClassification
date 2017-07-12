@@ -1,107 +1,151 @@
 package util.pipeline;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.inject.Inject;
 import model.Label;
-import model.Pipeline;
-import org.apache.commons.io.FileUtils;
-import org.apache.spark.ml.PipelineStage;
-import org.apache.spark.ml.classification.OneVsRest;
-import org.apache.spark.ml.feature.HashingTF;
-import org.apache.spark.ml.feature.NGram;
-import org.apache.spark.ml.feature.Tokenizer;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Row;
-import org.apache.spark.sql.types.DataTypes;
-import org.apache.spark.sql.types.Metadata;
-import org.apache.spark.sql.types.StructField;
-import org.apache.spark.sql.types.StructType;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import play.Play;
+import play.libs.Json;
+import play.libs.ws.WSClient;
+import services.HelperService;
+import util.RestCaller;
 import util.StaticFunctions;
-import util.mlLib.DefaultOneVsRest;
-import util.textProcessing.DefaultHashingTF;
-import util.textProcessing.DefaultTokenizer;
 import util.training.TrainingPipeline;
+import weka.Classifiers.ClassifierFactory;
+import weka.Classifiers.WekaFilteredClassifier;
+import weka.Filters.WekaStringToWordVector;
+import weka.classifiers.AbstractClassifier;
+import weka.classifiers.Evaluation;
+import weka.core.*;
 
-import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.ObjectOutputStream;
+import java.net.HttpURLConnection;
+import java.util.*;
+
+import static play.mvc.Results.ok;
+import static util.RestCaller.*;
+import static util.StaticFunctions.getStringValueFromSCObject;
 
 /**
  * Created by mahabaleshwar on 10/24/2016.
  */
 public class ExampleTrainingPipeline extends TrainingPipeline {
-    List<Row> data = new ArrayList();
-    Map labelMap = new HashMap();
+    WSClient ws;
+    private AbstractClassifier classifer;
+    private WekaFilteredClassifier wfc;
+    private String modelFileName;
+    private int crossValidation;
+    private Instances trainingData;
 
-    public void loadDocuments(Pipeline pipeline) {
-        List<Label> labels = pipeline.getLabels();
-        for(int i=0; i<labels.size(); i++) {
-            Label label = labels.get(i);
-            labelMap.put(i, label.getName());
-            /*
-            if(labels.get(i).getType() == "customType")
-                data.addAll(StaticFunctions.getRDDs(this.getSparkContext(), label.getPath(), i).collect());
-            else
-                data.addAll(StaticFunctions.getRDDsFromHref(this.getSparkContext(), label, i, pipeline).collect());
-            */
-        }
-        data = StaticFunctions.getRDDsFromHref(this.getSparkContext(), labels, pipeline);
+    public ExampleTrainingPipeline(WSClient ws) {
+        this.ws = ws;
     }
 
     @Override
-    public void createDataFrame(Pipeline pipeline) {
-        loadDocuments(pipeline);
-        StructType schema = new StructType(new StructField[]{
-                new StructField(StaticFunctions.LABEL, DataTypes.DoubleType, false, Metadata.empty()),
-                new StructField(StaticFunctions.TEXT, DataTypes.StringType, false, Metadata.empty())
+    public void init() {
+        crossValidation = 10;
+        classifer = new ClassifierFactory().get();
+    }
+
+    @Override
+    public void load() {
+        modelFileName = pipeline.getName();
+        List<Label> labels = pipeline.getLabels();
+        FastVector<String> fvNominalVal = new FastVector<>(labels.size());
+        labels.forEach(label -> fvNominalVal.addElement(label.getName()));
+
+        Attribute attribute1 = new Attribute("class", fvNominalVal);
+        Attribute attribute2 = new Attribute("text", (FastVector<String>) null);
+
+        FastVector<Attribute> fvWekaAttributes = new FastVector<>();
+        fvWekaAttributes.addElement(attribute1);
+        fvWekaAttributes.addElement(attribute2);
+
+        trainingData = new Instances("relation", fvWekaAttributes, 0);
+        trainingData.setClassIndex(0);
+
+        Map dataMap = getData(labels);
+        dataMap.forEach((key, values) -> {
+            ArrayList entities = (ArrayList) values;
+            entities.forEach(e -> {
+                Instance i = new DenseInstance(2);
+                i.setValue(fvWekaAttributes.elementAt(0), (String) key);
+                i.setValue(fvWekaAttributes.elementAt(1), (String) e);
+                trainingData.add(i);
+            });
         });
 
-        Dataset<Row> dataset = this.getSqlContext().createDataFrame(data, schema);
-        dataset.repartition(3);
-        Dataset<Row>[] splits = dataset.randomSplit(new double[]{0.7, 0.3});
-        this.setTrainingData(splits[0]);
-        this.setTestingData(splits[1]);
+        System.out.println("===== Instance created with reference dataset =====");
+        System.out.println(trainingData);
     }
 
     @Override
-    public void setStages() {
-        Tokenizer tokenizer = DefaultTokenizer.get();
-        //Word2Vec word2vec = new DefaultWord2Vec().get(tokenizer);
-        //Stemmer stemmed = new Stemmer().setInputCol(tokenizer.getOutputCol()).setOutputCol("stemmed").setLanguage("English");
-        NGram ng = new NGram().setInputCol(tokenizer.getOutputCol()).setOutputCol("rawFeatures").setN(3);
-        HashingTF hashingTF = DefaultHashingTF.get(tokenizer.getOutputCol(), 10000);
-        //LogisticRegression lr = new DefaultLogisticRegression().get();
-        //DecisionTreeClassifier dtc = DefaultDecisionTreeClassifier.get();
-        //SVMWithSGD svm = new DefaultSVMWithSGD().get();
-        //NaiveBayes nb = new DefaultNaiveBayes().get();
-        //KMeans kmeans = new KMeans().setK(3);
-        //LDA lda = new LDA().setK(10).setMaxIter(10);
-        OneVsRest ovr = new DefaultOneVsRest().get();
-        //RandomForestClassifier rfc = new DefaultRandomForestClassifier().get();
-        this.getPipeline().setStages(new PipelineStage[]{tokenizer, ng, hashingTF, ovr});
-    }
-
-    @Override
-    public void trainDocuments() {
-        this.setModel(this.getPipeline().fit(this.getTrainingData()));
-    }
-
-    @Override
-    public ObjectNode testDocuments() {
-        Dataset<Row> predictions = this.getModel().transform(this.getTestingData());
-        predictions.show();
-        return StaticFunctions.printResults(predictions.select("prediction", "label"), labelMap);
-    }
-
-    @Override
-    public void saveModel(Pipeline pipeline) {
+    public void process() {
         try {
-            FileUtils.deleteDirectory(new File("sparkModels/" + pipeline.getName()));
-            this.getModel().save("sparkModels/" + pipeline.getName());
-        } catch (IOException e) {
+            wfc = new WekaFilteredClassifier(new WekaStringToWordVector().get(), classifer);
+            wfc.getFC().buildClassifier(trainingData);
+        } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public String evaluate() {
+        try {
+            Evaluation eval = new Evaluation(trainingData);
+            eval.crossValidateModel(wfc.getFC(), trainingData, crossValidation, new Random(1));
+            return eval.toSummaryString("\nResults\n======\n", false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    @Override
+    public void save() {
+        try {
+            ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(Play.application().getFile("/public/" + modelFileName)));
+            out.writeObject(wfc.getFC());
+            out.close();
+            System.out.println("===== Saved model: " + modelFileName + " =====");
+        } catch (IOException e) {
+            System.out.println("Problem found when writing: " + modelFileName);
+        }
+    }
+
+    private Map getData(List<Label> labels) {
+        Map map = new HashMap();
+        List<String> miningAttributes = pipeline.getMiningAttributes();
+        labels.forEach(label -> map.put(label.getName(), new ArrayList<String>()));
+
+        HelperService hs = new HelperService(ws);
+        System.out.println(labels.get(0).getPath() + "/entities");
+        hs.entitiesForPath(labels.get(0).getPath() + "/entities").thenApply(entityObject -> {
+            entityObject.forEach(entity -> {
+                hs.entityForUid(entity.get("id").asText("")).thenApply(e -> {
+                    JsonNode entityAttributes = e.get("attributes");
+                    String text = "";
+                    for (int j = 0; j < labels.size(); j++) {
+                        Label label = labels.get(j);
+                        if (StaticFunctions.tagValuesMatch(entityAttributes, pipeline.getTag(), label)) {
+                            for (String miningAttribute : miningAttributes) {
+                                String textValue = getStringValueFromSCObject(entityAttributes, miningAttribute);
+                                if (textValue != null) text += " " + textValue;
+                            }
+                            if (text != "") ((ArrayList) map.get(label.getName())).add(text.replaceAll("class", ""));
+                        }
+                    }
+                    return ok();
+                }).toCompletableFuture().join();
+            });
+            return ok();
+        }).toCompletableFuture().join();
+
+        return map;
     }
 }

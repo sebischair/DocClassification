@@ -48,16 +48,7 @@
         <br />
         <div ng-if="vm.showResults === true" class="row">
             <h2>Results of document classification</h2>
-            <table class="table">
-                <tr>
-                    <th>Text</th>
-                    <th>Label</th>
-                </tr>
-                <tr ng-repeat="row in vm.results">
-                    <td>{{row.text | limitTo: 50}} ...</td>
-                    <td>{{vm.pipeline.labels[row.prediction].name}}</td>
-                </tr>
-            </table>
+            {{ vm.results }}
             <div ng-if='vm.workspace !== ""' class="row">
                 <button type="button" class="btn btn-danger" ng-click="vm.updateFilesInSC()">Update Files in SocioCortex</button>
             </div>
