@@ -11,7 +11,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Created by mahabaleshwar on 10/26/2016.
+ * Created by Manoj on 10/26/2016.
  */
 @Entity("pipelines")
 @Indexes(@Index(value = "name", fields = @Field("name")))

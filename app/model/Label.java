@@ -3,7 +3,7 @@ package model;
 import org.mongodb.morphia.annotations.Embedded;
 
 /**
- * Created by mahabaleshwar on 10/26/2016.
+ * Created by Manoj on 10/26/2016.
  */
 @Embedded
 public class Label {

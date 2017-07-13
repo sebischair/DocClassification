@@ -3,7 +3,7 @@ package util.training;
 import model.Pipeline;
 
 /**
- * Created by mahabaleshwar on 10/24/2016.
+ * Created by Manoj on 10/24/2016.
  */
 public abstract class TrainingPipeline {
     public Pipeline pipeline;

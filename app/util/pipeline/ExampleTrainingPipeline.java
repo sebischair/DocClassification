@@ -1,17 +1,11 @@
 package util.pipeline;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.inject.Inject;
 import model.Label;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import play.Logger;
 import play.Play;
-import play.libs.Json;
 import play.libs.ws.WSClient;
 import services.HelperService;
-import util.RestCaller;
 import util.StaticFunctions;
 import util.training.TrainingPipeline;
 import weka.Classifiers.ClassifierFactory;
@@ -24,15 +18,13 @@ import weka.core.*;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.net.HttpURLConnection;
 import java.util.*;
 
 import static play.mvc.Results.ok;
-import static util.RestCaller.*;
 import static util.StaticFunctions.getStringValueFromSCObject;
 
 /**
- * Created by mahabaleshwar on 10/24/2016.
+ * Created by Manoj on 10/24/2016.
  */
 public class ExampleTrainingPipeline extends TrainingPipeline {
     WSClient ws;
@@ -80,8 +72,8 @@ public class ExampleTrainingPipeline extends TrainingPipeline {
             });
         });
 
-        System.out.println("===== Instance created with reference dataset =====");
-        System.out.println(trainingData);
+        Logger.info("===== Instance created with reference dataset =====");
+        Logger.info(trainingData.toString());
     }
 
     @Override
@@ -112,9 +104,9 @@ public class ExampleTrainingPipeline extends TrainingPipeline {
             ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(Play.application().getFile("/public/" + modelFileName)));
             out.writeObject(wfc.getFC());
             out.close();
-            System.out.println("===== Saved model: " + modelFileName + " =====");
+            Logger.info("===== Saved model: " + modelFileName + " =====");
         } catch (IOException e) {
-            System.out.println("Problem found when writing: " + modelFileName);
+            Logger.info("Problem found when writing: " + modelFileName);
         }
     }
 

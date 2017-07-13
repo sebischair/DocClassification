@@ -1,12 +1,11 @@
 package util.prediction;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import model.Pipeline;
 import weka.classifiers.AbstractClassifier;
 import weka.core.Instances;
 
 /**
- * Created by mahabaleshwar on 10/24/2016.
+ * Created by Manoj on 10/24/2016.
  */
 public abstract class PredictionPipeline {
     public Pipeline pipeline = null;

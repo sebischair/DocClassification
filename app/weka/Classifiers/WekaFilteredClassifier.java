@@ -5,7 +5,7 @@ import weka.classifiers.meta.FilteredClassifier;
 import weka.filters.Filter;
 
 /**
- * Created by mahabaleshwar on 7/12/2017.
+ * Created by Manoj on 7/12/2017.
  */
 public class WekaFilteredClassifier {
     FilteredClassifier fc;

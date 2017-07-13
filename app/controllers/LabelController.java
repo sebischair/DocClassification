@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by mahabaleshwar on 10/27/2016.
+ * Created by Manoj on 10/27/2016.
  */
 public class LabelController extends Controller {
 
@@ -27,8 +27,8 @@ public class LabelController extends Controller {
 
         List<JsonNode> miningAttributes = jo.findValues("miningAttributes");
         ArrayList<String> attributes = new ArrayList<>();
-        if(miningAttributes.size() == 1) {
-            for(JsonNode ma: miningAttributes.get(0)) {
+        if (miningAttributes.size() == 1) {
+            for (JsonNode ma : miningAttributes.get(0)) {
                 attributes.add(ma.asText());
             }
             new Pipeline().updateMiningAttributes(pipelineName, attributes);
@@ -37,7 +37,7 @@ public class LabelController extends Controller {
         new Pipeline().updateLabel(pipelineName, label);
 
         ObjectNode result = Json.newObject();
-        if(new Pipeline().addNewLabel(pipelineName, labelName, labelPath, labelId, labelType)) {
+        if (new Pipeline().addNewLabel(pipelineName, labelName, labelPath, labelId, labelType)) {
             result.put("status", "OK");
             result.put("result", StaticFunctions.deserializeToJSON(StaticFunctions.getPipeline(pipelineName)));
         } else {
@@ -55,7 +55,7 @@ public class LabelController extends Controller {
         String labelType = request().body().asJson().get("labelType").asText();
 
         ObjectNode result = Json.newObject();
-        if(new Pipeline().removeLabel(pipelineName, labelName, labelPath, labelId, labelType)) {
+        if (new Pipeline().removeLabel(pipelineName, labelName, labelPath, labelId, labelType)) {
             result.put("status", "OK");
             result.put("result", StaticFunctions.deserializeToJSON(StaticFunctions.getPipeline(pipelineName)));
         } else {
@@ -64,5 +64,4 @@ public class LabelController extends Controller {
         }
         return ok(result);
     }
-
 }

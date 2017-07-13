@@ -4,7 +4,7 @@ import weka.core.stemmers.NullStemmer;
 import weka.filters.unsupervised.attribute.StringToWordVector;
 
 /**
- * Created by mahabaleshwar on 7/12/2017.
+ * Created by Manoj on 7/12/2017.
  */
 public class WekaStringToWordVector {
     private StringToWordVector stw;

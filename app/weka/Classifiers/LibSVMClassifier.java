@@ -5,7 +5,7 @@ import weka.classifiers.functions.LibSVM;
 import weka.core.SelectedTag;
 
 /**
- * Created by mahabaleshwar on 7/9/2017.
+ * Created by Manoj on 7/9/2017.
  */
 public class LibSVMClassifier {
     private LibSVM svm;

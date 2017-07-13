@@ -6,15 +6,12 @@ import com.mongodb.util.JSON;
 import controllers.MorphiaObject;
 import model.Label;
 import model.Pipeline;
-import org.apache.lucene.analysis.CharArraySet;
-import org.tartarus.snowball.ext.PorterStemmer;
 import play.mvc.Result;
 
-import java.io.IOException;
 import java.util.*;
 
 /**
- * Created by mahabaleshwar on 10/24/2016.
+ * Created by Manoj on 10/24/2016.
  */
 public class StaticFunctions {
     public static String LABEL = "label";
@@ -23,8 +20,6 @@ public class StaticFunctions {
     public static String WORDS = "words";
     public static String[] STOPWORDS = {"a", "an", "and", "the", "that", "they", "which", "we", "us", "i", "me", "like", "that", "only", "much", "kafka", "it", "is", "if", "by", "basically", "are", "as", "but", "those", "spark", "also"};
     public static final Set<String> STOPWORDS_SET = new HashSet<String>(Arrays.asList(STOPWORDS));
-    private static final CharArraySet STOPWORDS_CHARSET = CharArraySet.unmodifiableSet(CharArraySet.copy(STOPWORDS_SET));
-    ;
 
     public static boolean tagValuesMatch(JsonNode entityAttributes, String tag, Label label) {
         for (int j = 0; j < entityAttributes.size(); j++) {
@@ -34,9 +29,7 @@ public class StaticFunctions {
                 if (jsonValue.size() > 0) {
                     if (label.getType().equals("Boolean")) {
                         Boolean value = jsonValue.get(0).asBoolean(false);
-                        if ((value && label.getName().equals("1")) || (!value && label.getName().equals("0")))
-                            return true;
-                        else return false;
+                        return (value && label.getName().equals("1")) || (!value && label.getName().equals("0"));
                     } else {
                         return jsonValue.get(0).get("name").asText("").equalsIgnoreCase(label.getName());
                     }
@@ -65,23 +58,21 @@ public class StaticFunctions {
         DBObject dbObj;
         for (Object obj : objList) {
             dbObj = MorphiaObject.morphia.toDBObject(obj);
-            for (int i = 0; i < removeAttributes.length; i++) {
-                dbObj.removeField(removeAttributes[i]);
+            for (String removeAttribute : removeAttributes) {
+                dbObj.removeField(removeAttribute);
             }
             dbObjList.add(dbObj);
         }
-        String json = JSON.serialize(dbObjList);
-        return json;
+        return JSON.serialize(dbObjList);
     }
 
     public static String deserializeToJSON(Object obj, String... removeAttributes) {
         DBObject dbObj;
         dbObj = MorphiaObject.morphia.toDBObject(obj);
-        for (int i = 0; i < removeAttributes.length; i++) {
-            dbObj.removeField(removeAttributes[i]);
+        for (String removeAttribute : removeAttributes) {
+            dbObj.removeField(removeAttribute);
         }
-        String json = JSON.serialize(dbObj);
-        return json;
+        return JSON.serialize(dbObj);
     }
 
     public static Pipeline getPipeline(String pipelineName) {
@@ -98,17 +89,5 @@ public class StaticFunctions {
             text = text.replaceAll("\\b" + s + "\\b", "");
         }
         return text.replaceAll("[()]", "method");
-    }
-
-    public static String stemWords(String input) throws IOException {
-        PorterStemmer stem = new PorterStemmer();
-        StringBuilder builder = new StringBuilder(input.length());
-        String[] words = input.split("\\s+");
-        for (String word : words) {
-            stem.setCurrent(word);
-            stem.stem();
-            builder.append(stem.getCurrent() + " ");
-        }
-        return builder.toString();
     }
 }
