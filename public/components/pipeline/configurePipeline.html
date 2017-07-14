@@ -4,73 +4,112 @@
             <h1>Pipeline: {{vm.pipeline.name}}</h1>
         </div>
         <div class="col-md-4" style="padding-top: 25px">
-            <button type="button" class="btn btn-primary" ng-click="vm.newLabel()"> + New Label</button>
-            <button type="button" class="btn btn-primary" ng-click="vm.linkSC()" data-toggle="collapse" data-target="#selectWorkspace" aria-expanded="false" aria-controls="selectWorkspace">
+            <button type="button" class="btn btn-primary" ng-click="vm.linkSC()" data-toggle="collapse"
+                    data-target="#selectWorkspace" aria-expanded="false" aria-controls="selectWorkspace">
                 Link SocioCortex workspace
             </button>
         </div>
     </div>
     <div id="selectWorkspace" class="collapse">
-        <b>Select a Workspace</b>
-        <select name="workspaceSelect" id="workspaceSelect" ng-model="vm.workspace" ng-change="vm.getPages()">
-            <option ng-repeat="option in vm.workspaces" value="{{option.id}}">{{option.name}}</option> <br />
-        </select>
-        <div>
-            <br />
-            <span><input type="checkbox" ng-model="vm.typeCheckBox"><b>Select Types</b></span> OR
-            <span><input type="checkbox" ng-model="vm.pageCheckBox"><b>Select Pages</b></span><br /><br />
-        </div>
-
-        <div ng-if="vm.typeCheckBox">
-            <div ng-if='vm.workspace != "" && vm.typeCheckBox'>
+        <div class="jumbotron">
+            <div class="row">
+                <b>Select a Workspace</b>
+                <select name="workspaceSelect" id="workspaceSelect" ng-model="vm.workspace" ng-change="vm.getPages()">
+                    <option ng-repeat="option in vm.workspaces" value="{{option.id}}">{{option.name}}</option>
+                    <br/>
+                </select>
+            </div>
+            <div>
+                <br/>
                 <div class="row">
-                    <div class="col-md-12"><b>Select Types</b></div>
-                    <div class="col-md-2" ng-repeat="type in vm.types">
-                        <input type="checkbox" checklist-model="vm.selectedTypes" checklist-value="type" ng-click="updateSelection($index, entities)" ng-change="vm.getAttributes(type)"> {{type.name}}
-                    </div><br />
-                </div>
-
-                <div ng-if='vm.selectedTypes.length == 1'>
-                    <div class="row">
-                        <div class="col-md-12"><b>Select attributes for mining</b></div>
-                        <div class="col-md-2" ng-repeat="attribute in vm.attributes">
-                            <input type="checkbox" checklist-model="vm.selectedAttributesForMining" checklist-value="attribute"> {{attribute.name}}
-                        </div><br />
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-12"><b>Select an attribute for labeling</b></div>
-                        <div class="col-md-2" ng-repeat="attribute in vm.attributes">
-                            <input type="checkbox" checklist-model="vm.selectedAttributes" checklist-value="attribute" ng-click="updateSelection($index, entities)" ng-change="vm.getAttributeValues(attribute.id)"> {{attribute.name}}
-                        </div><br /><br />
-                    </div>
-
-                    <div ng-if='vm.selectedAttributes.length == 1'>
-                        <div class="col-md-12"><b>Select attribute values as labels</b></div>
-                        <div class="row">
-                            <div class="col-md-2" ng-if='vm.attributeType=="Boolean"' ng-repeat="value in vm.values">
-                                <input type="checkbox" checklist-model="vm.selectedValues" checklist-value="value"> {{value}}
-                            </div>
-                            <div class="col-md-2" ng-if='vm.attributeType=="Link"' ng-repeat="value in vm.values">
-                                <input type="checkbox" checklist-model="vm.selectedValues" checklist-value="value"> {{value.name}}
-                            </div><br />
+                    <div class="col-lg-6">
+                        <div class="input-group">
+                              <span class="input-group-addon">
+                                <input type="checkbox" aria-label="..." ng-model="vm.typeCheckBox">
+                              </span>
+                            <input type="text" class="form-control" value="Select Types" disabled>
                         </div>
-                        <button type="button" class="btn btn-primary" ng-click="vm.updateLabels()">Update Labels</button>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="input-group">
+                              <span class="input-group-addon">
+                                <input type="checkbox" aria-label="..." ng-model="vm.pageCheckBox">
+                              </span>
+                            <input type="text" class="form-control" value="Select Pages" disabled>
+                        </div>
+                    </div>
+                </div>
+                <br/>
+            </div>
+
+            <div ng-if="vm.typeCheckBox">
+                <div ng-if='vm.workspace != "" && vm.typeCheckBox'>
+                    <div class="row">
+                        <div class="col-md-12"><b>Select Types</b></div>
+                        <div class="col-md-2" ng-repeat="type in vm.types">
+                            <input type="checkbox" checklist-model="vm.selectedTypes" checklist-value="type"
+                                   ng-click="updateSelection($index, entities)" ng-change="vm.getAttributes(type)">
+                            {{type.name}}
+                        </div>
+                        <br/>
+                    </div>
+                    <hr/>
+                    <div ng-if='vm.selectedTypes.length == 1'>
+                        <div class="row">
+                            <div class="col-md-12"><b>Select attributes for mining</b></div>
+                            <div class="col-md-2" ng-repeat="attribute in vm.attributes">
+                                <input type="checkbox" checklist-model="vm.selectedAttributesForMining"
+                                       checklist-value="attribute"> {{attribute.name}}
+                            </div>
+                            <br/>
+                        </div>
+                        <hr/>
+                        <div class="row">
+                            <div class="col-md-12"><b>Select an attribute for labeling</b></div>
+                            <div class="col-md-2" ng-repeat="attribute in vm.attributes">
+                                <input type="checkbox" checklist-model="vm.selectedAttributes"
+                                       checklist-value="attribute"
+                                       ng-click="updateSelection($index, entities)"
+                                       ng-change="vm.getAttributeValues(attribute.id)"> {{attribute.name}}
+                            </div>
+                            <br/><br/>
+                        </div>
+                        <hr/>
+                        <div ng-if='vm.selectedAttributes.length == 1'>
+                            <div class="col-md-12"><b>Select attribute values as labels</b></div>
+                            <div class="row">
+                                <div class="col-md-2" ng-if='vm.attributeType=="Boolean"'
+                                     ng-repeat="value in vm.values">
+                                    <input type="checkbox" checklist-model="vm.selectedValues" checklist-value="value">
+                                    {{value}}
+                                </div>
+                                <div class="col-md-2" ng-if='vm.attributeType=="Link"' ng-repeat="value in vm.values">
+                                    <input type="checkbox" checklist-model="vm.selectedValues" checklist-value="value">
+                                    {{value.name}}
+                                </div>
+                                <br/>
+                            </div>
+                            <hr/>
+                            <button type="button" class="btn btn-primary" ng-click="vm.updateLabels()">Update Labels
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div ng-if='vm.workspace != "" && vm.pageCheckBox'>
-            <p><b>Select Pages</b></p>
-            <p ng-repeat="page in vm.pages">
-                <input type="checkbox" checklist-model="vm.selectedPages" checklist-value="page"> {{page.name}}
-            </p>
-        </div>
-        <div ng-if='vm.selectedPages.length > 0'>
-            <button type="button" class="btn btn-primary" ng-click="vm.updateLabels()">Update Labels</button>
-        </div>
-        <div align="right">
-            <button type="button" class="btn btn-default" data-toggle="collapse" data-target="#selectWorkspace">Close</button>
+            <div ng-if='vm.workspace != "" && vm.pageCheckBox'>
+                <p><b>Select Pages</b></p>
+                <p ng-repeat="page in vm.pages">
+                    <input type="checkbox" checklist-model="vm.selectedPages" checklist-value="page"> {{page.name}}
+                </p>
+            </div>
+            <div ng-if='vm.selectedPages.length > 0'>
+                <button type="button" class="btn btn-primary" ng-click="vm.updateLabels()">Update Labels</button>
+            </div>
+            <div align="right">
+                <button type="button" class="btn btn-default" data-toggle="collapse" data-target="#selectWorkspace">
+                    Close
+                </button>
+            </div>
         </div>
     </div>
 
@@ -78,13 +117,13 @@
         <div class="panel-body">
             <div class="input-group">
                 <label>Label name:</label>
-                <input type="text" class="form-control" ng-model="vm.labelName" required ng-trim="true" />
+                <input type="text" class="form-control" ng-model="vm.labelName" required ng-trim="true"/>
 
-                <br />
+                <br/>
                 <label>Label path:</label>
-                <input type="text" class="form-control" ng-model="vm.labelPath" required ng-trim="true" />
+                <input type="text" class="form-control" ng-model="vm.labelPath" required ng-trim="true"/>
             </div>
-            <br />
+            <br/>
             <div>
                 <button type="button" class="btn btn-primary" ng-click="vm.createLabel()">Save</button>
                 <button type="button" class="btn btn-default" ng-click="vm.cancelCreateLabel()">Cancel</button>
@@ -99,8 +138,11 @@
     </div>
 
     <div ng-if="vm.pipeline.labels.length > 0">
-        <hr />
-        <h1>Document labels</h1>
+        <hr/>
+        <h3>Labels</h3>
+        <div ng-if="vm.pipeline.classifier.length > 0">
+            <b>Selected classifier: {{vm.pipeline.classifier}}</b>
+        </div>
         <table class="table">
             <tr>
                 <th>Label name</th>
@@ -116,44 +158,50 @@
     </div>
 
     <div ng-if="vm.pipeline.labels.length > 0">
-        <hr />
+        <hr/>
+        <h4>Select a classifier</h4>
+        <select name="classifierSelect" id="classifierSelect" ng-model="vm.classifier"
+                ng-change="vm.updateClassifier()">
+            <option ng-repeat="option in vm.classifiers" value="{{option.name}}">{{option.name}}</option>
+            <br/>
+        </select>
+    </div>
+
+    <div ng-if="vm.pipeline.labels.length > 0">
+        <hr/>
         <button type="button" class="btn btn-primary" ng-click="vm.trainDocuments()">Train documents</button>
     </div>
-    <br />
+    <br/>
+    <div ng-if="vm.isTraining === true" class="jumbotron">
+        Please wait! The system is training the ML model!
+    </div>
     <div ng-if="vm.showResults === true" class="jumbotron">
-        <h2> Prediction results on test data</h2>
-        <b>Accuracy: {{vm.results.Accuracy}}%</b> <br /><br />
-
-        <b>Confusion Matrix </b>
-        <table class="table table-bordered">
-            <tr>
-                <th></th>
-                <th ng-repeat="label in vm.pipeline.labels">{{label.name}}</th>
-            </tr>
-            <tr ng-repeat="label in vm.pipeline.labels track by $index">
-                <td>{{label.name}}</td>
-                <td ng-repeat="val in vm.cmatrix[label.name] track by $index">{{val}}</td>
-            </tr>
-        </table>
-
-        <table class="table">
-            <tr>
-                <th>Class</th>
-                <th>Precision(%)</th>
-                <th>Recall(%)</th>
-                <th>F1 Score(%)</th>
-            </tr>
-
-            <tr ng-repeat="label in vm.pipeline.labels track by $index">
-                <td>{{label.name}}</td>
-                <td ng-repeat="val in vm.results[label.name] track by $index">{{val}}</td>
-            </tr>
-        </table>
-
-        <div><b>Weighted results</b></div>
-        <div>Weighted precision: {{vm.results.weighted_precision}}%</div>
-        <div>Weighted recall: {{vm.results.weighted_recall}}%</div>
-        <div>Weighted F1 score: {{vm.results.weighted_F1_score}}%</div>
-        <div>Weighted false positive rate: {{vm.results.weighted_false_positive_rate}}%</div>
+        <h2>Prediction results on test data</h2>
+        <div class="row">
+            <div class="col-md-4">Total number of instances</div>
+            <div class="col-md-8"><b>{{vm.result.totalInstances}}</b></div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">Correctly classified instances</div>
+            <div class="col-md-4"><b>{{vm.result.correctInstances}}</b></div>
+            <div class="col-md-4"><b>{{vm.result.pctCorrectInstances}}%</b></div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">Incorrectly classified instances</div>
+            <div class="col-md-4"><b>{{vm.result.inCorrectInstances}}</b></div>
+            <div class="col-md-4"><b>{{vm.result.pctInCorrectInstances}}%</b></div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">Precision</div>
+            <div class="col-md-8"><b>{{vm.result.precision}}</b></div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">Recall</div>
+            <div class="col-md-8"><b>{{vm.result.recall}}</b></div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">FScore</div>
+            <div class="col-md-8"><b>{{vm.result.fscore}}</b></div>
+        </div>
     </div>
 </div>

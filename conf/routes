@@ -4,25 +4,27 @@
 
 # An example controller showing a sample home page
 
-GET     /                       controllers.HomeController.index
+GET     /                               controllers.HomeController.index
 
-GET     /pipeline/train         controllers.PipelineController.train(name: String ?= "")
-POST    /pipeline/predict       controllers.PipelineController.predict
-POST    /pipeline/predictAndClassify       controllers.PipelineController.predictAndClassify
+GET     /pipeline/train                 controllers.PipelineController.train(name: String ?= "")
+POST    /pipeline/predict               controllers.PipelineController.predict
+POST    /pipeline/predictAndClassify    controllers.PipelineController.predictAndClassify
+POST    /pipeline/classifier            controllers.PipelineController.setClassifier
 
 
-GET     /pipeline/create        controllers.PipelineController.create(name: String ?= "")
-GET     /pipeline/remove        controllers.PipelineController.remove(name: String ?= "")
-GET     /pipeline/getAll        controllers.PipelineController.getAll
-GET     /pipeline/get           controllers.PipelineController.get(name: String ?= "")
+GET     /pipeline/create                controllers.PipelineController.create(name: String ?= "")
+GET     /pipeline/remove                controllers.PipelineController.remove(name: String ?= "")
+GET     /pipeline/getAll                controllers.PipelineController.getAll
+GET     /pipeline/get                   controllers.PipelineController.get(name: String ?= "")
+GET     /classifiers                    controllers.PipelineController.getClassifiers
 
-POST     /label/create          controllers.LabelController.create
-POST     /label/remove          controllers.LabelController.remove
+POST    /label/create                   controllers.LabelController.create
+POST    /label/remove                   controllers.LabelController.remove
 
 # Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file           controllers.Assets.versioned(path="/public", file: Asset)
-GET     /webjars/*file          controllers.WebJarAssets.at(file)
+GET     /assets/*file                   controllers.Assets.versioned(path="/public", file: Asset)
+GET     /webjars/*file                  controllers.WebJarAssets.at(file)
 
 
 # Any possible route, forwarded to Angular in order to allow html5Mode rather than hashbanging
-GET         /*any               controllers.HomeController.any(any)
+GET     /*any                           controllers.HomeController.any(any)

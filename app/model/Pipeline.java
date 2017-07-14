@@ -25,6 +25,8 @@ public class Pipeline extends  PersistentEntity {
     @Embedded
     List<Label> labels;
 
+    private String classifier;
+
     private List<String> stages;
 
     private List<String> miningAttributes;
@@ -46,6 +48,18 @@ public class Pipeline extends  PersistentEntity {
         this.stages = stages;
         this.modelPath = model_path;
         this.createdAt = created_at;
+    }
+
+    public boolean updateClassifier(String pipelineName, String classifier) {
+        try {
+            Query<Pipeline> query = (Query<Pipeline>) MorphiaObject.datastore.createQuery(this.getClass()).field("name").equalIgnoreCase(pipelineName);
+            UpdateOperations<Pipeline> ops = (UpdateOperations<Pipeline>) MorphiaObject.datastore.createUpdateOperations(this.getClass()).set("classifier", classifier);
+            MorphiaObject.datastore.update(query, ops);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public boolean updateModelPath(String pipelineName, String modelPath) {
@@ -165,5 +179,13 @@ public class Pipeline extends  PersistentEntity {
 
     public void setTag(String tag) {
         this.tag = tag;
+    }
+
+    public String getClassifier() {
+        return classifier;
+    }
+
+    public void setClassifier(String classifier) {
+        this.classifier = classifier;
     }
 }

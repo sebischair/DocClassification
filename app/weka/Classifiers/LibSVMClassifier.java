@@ -34,6 +34,7 @@ public class LibSVMClassifier {
     }
 
     public AbstractClassifier get() {
+        init();
         return svm;
     }
 }

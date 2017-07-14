@@ -1,5 +1,6 @@
 package util.training;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import model.Pipeline;
 
 /**
@@ -11,14 +12,14 @@ public abstract class TrainingPipeline {
     public abstract void init();
     public abstract void load();
     public abstract void process();
-    public abstract String evaluate();
+    public abstract ObjectNode evaluate();
     public abstract void save();
-    public String run(Pipeline pipeline) {
+    public ObjectNode run(Pipeline pipeline) {
         this.pipeline = pipeline;
         init();
         load();
         process();
-        String result = evaluate();
+        ObjectNode result = evaluate();
         save();
         return result;
     }

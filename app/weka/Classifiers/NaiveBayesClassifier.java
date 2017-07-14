@@ -15,6 +15,7 @@ public class NaiveBayesClassifier {
     }
 
     public AbstractClassifier get() {
+        init();
         return nb;
     }
 }

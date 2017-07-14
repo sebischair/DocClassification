@@ -2,6 +2,7 @@ package controllers;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.inject.Inject;
+import model.Classifier;
 import model.Pipeline;
 import play.libs.Json;
 import play.libs.ws.WSClient;
@@ -41,6 +42,13 @@ public class PipelineController extends Controller {
         return ok(result);
     }
 
+    public Result getClassifiers() {
+        ObjectNode result = Json.newObject();
+        result.put("status", "OK");
+        result.put("result", StaticFunctions.deserializeToJSON(new Classifier().getAll()));
+        return ok(result);
+    }
+
     public Result create(String name) {
         ObjectNode result = Json.newObject();
         Pipeline pipeline = new Pipeline();
@@ -65,10 +73,19 @@ public class PipelineController extends Controller {
         return ok(result);
     }
 
+    public Result setClassifier() {
+        ObjectNode results = Json.newObject();
+        String pipelineName = request().body().asJson().get("pipelineName").asText();
+        String classifierName = request().body().asJson().get("classifierName").asText();
+        boolean result = new Pipeline().updateClassifier(pipelineName, classifierName);
+        results.put("result", result);
+        return ok(results);
+    }
+
     public Result train(String pipelineName) {
         ObjectNode results = Json.newObject();
         Pipeline pipeline = StaticFunctions.getPipeline(pipelineName);
-        String result = new ExampleTrainingPipeline(ws).run(pipeline);
+        ObjectNode result = new ExampleTrainingPipeline(ws).run(pipeline);
         results.put("status", "OK");
         results.put("result", result);
         return ok(results);
@@ -77,7 +94,7 @@ public class PipelineController extends Controller {
     public Result predict() {
         ObjectNode results = Json.newObject();
         String pipelineName = request().body().asJson().get("pipelineName").asText();
-        String text = request().body().asJson().get("text").asText();
+        String text = request().body().asJson().get("textToClassify").asText();
         Pipeline pipeline = StaticFunctions.getPipeline(pipelineName);
         String result = new ExamplePredictionPipeline().execute(pipeline, text);
         results.put("status", "OK");

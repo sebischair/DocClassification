@@ -15,9 +15,16 @@ pipelineApp.factory('PipelineDataService', ['$http', function PipelineDataServic
                 return response.data;
             });
     };
+    var getClassifiers = function() {
+        return $http.get('/classifiers')
+            .then(function (response) {
+                return response.data;
+            });
+    };
     return {
         getPipelines: getPipelines,
-        getPipeline: getPipeline
+        getPipeline: getPipeline,
+        getClassifiers: getClassifiers
     };
 }]);
 
@@ -39,6 +46,8 @@ pipelineApp.config(['$routeProvider', function($routeProvider) {
         resolve: {
             pipeline: function(PipelineDataService, $route) {
                 return PipelineDataService.getPipeline($route.current.params.param);
+            }, classifiers: function(PipelineDataService) {
+                return PipelineDataService.getClassifiers();
             }
         }
     });
@@ -77,11 +86,14 @@ pipelineApp.controller('PipelineCtrl', ['pipelines', '$http', '$location', funct
 
 }]);
 
-pipelineApp.controller('ConfigurePipelineCtrl', ['scAuth', 'scData', 'scModel', 'pipeline', '$http', function(scAuth, scData, scModel, pipeline, $http) {
+pipelineApp.controller('ConfigurePipelineCtrl', ['scAuth', 'scData', 'scModel', 'pipeline', 'classifiers', '$http', function(scAuth, scData, scModel, pipeline, classifiers, $http) {
     var self = this;
     self.pipeline = JSON.parse(pipeline.result);
+    self.classifiers = JSON.parse(classifiers.result);
     self.createLabelFlag = false;
     self.workspace = "";
+    self.classifier = "";
+    self.isTraining = false;
 
     self.typeCheckBox = null;
     self.pageCheckBox = null;
@@ -142,29 +154,23 @@ pipelineApp.controller('ConfigurePipelineCtrl', ['scAuth', 'scData', 'scModel', 
     };
 
     self.trainDocuments = function() {
+        self.isTraining = true;
         $http.get('/pipeline/train?name=' + self.pipeline.name).
         then(function(response) {
-            self.results = response.data.result;
-
-            var noLabels = self.pipeline.labels.length;
-            var matrix = self.results.confusion_matrix;
-
-            self.cmatrix = {};
-            for(var i=0; i<noLabels; i++) {
-                var arr = [];
-                var count = i;
-                while(count  < noLabels * noLabels){
-                    arr.push(matrix[count]);
-                    count = count + noLabels;
-                }
-                self.cmatrix[self.pipeline.labels[i].name] = arr;
-            }
+            self.result = response.data.result;
             self.showResults = true;
+            self.isTraining = false;
         });
     };
 
+    self.updateClassifier = function() {
+        var data = {};
+        data.pipelineName = self.pipeline.name;
+        data.classifierName = self.classifier;
+        $http.post('/pipeline/classifier', data);
+    };
+
     self.linkSC = function() {
-        scAuth.login("manoj5864@gmail.com", "@Sebis5864");
         scData.Workspace.query(function (workspaces) {
             self.workspaces = workspaces;
         });

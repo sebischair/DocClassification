@@ -34,68 +34,23 @@ classifyApp.controller('ExecutePipelineCtrl', ['scAuth', 'scData', 'scModel', 'p
     var self = this;
     self.pipeline = JSON.parse(pipeline.result);
     self.showResults = false;
-    self.workspace = "";
-    self.rootEntity = null;
-    self.waitForSc = false;
-    self.resultMap = [];
-
-    self.linkWorkspace = function() {
-        self.waitForSc = true;
-        if(self.workspace != "") {
-            scData.Workspace.get({id: self.workspace}, function (workspace) {
-                self.rootEntity = workspace.rootEntity.href;
-                self.waitForSc = false;
-            });
-        }
-    };
+    self.textToClassify = "";
+    self.isPredicting = false;
 
     self.classifyDocuments = function() {
-        if((self.documentsPath === undefined || self.documentsPath.length == 0) && self.workspace == "") {
-            self.message = "Please provide the path to a directory or link a workspace!"
+        if(self.textToClassify === "") {
+            self.message = "Please provide the text to classify!"
         } else {
+            self.isPredicting = true;
             var data = {};
             data.pipelineName = self.pipeline.name;
-            if(self.workspace == "") {
-                data.documentsPath = self.documentsPath;
-            } else {
-                data.documentsPath = self.rootEntity;
-            }
+            data.textToClassify = self.textToClassify;
             $http.post('/pipeline/predict', data).
             then(function(response) {
-                response.data.result.forEach(function(result) {
-                    if(result.text.indexOf("api/v1/") > 0) {
-                        var r = result.text.split(" ---- ");
-                        result.text = r[1];
-                        var entityId = self.pipeline.labels[result.prediction].path.split("entities/")[1];
-                        var fileId = r[0].split("files/")[1];
-                        self.resultMap.push({key: fileId, value: entityId})
-                    }
-                });
-                self.results = response.data.result;
+                self.result = response.data.result;
                 self.showResults = true;
+                self.isPredicting = false;
             });
         }
     };
-
-    self.linkSC = function() {
-        scAuth.login("manoj5864@gmail.com", "@Sebis5864");
-        scData.Workspace.query(function (workspaces) {
-            self.workspaces = workspaces;
-        });
-    };
-
-    self.updateComplete = false;
-    self.updateFilesInSC = function() {
-        var p = self.resultMap.forEach(function(result) {
-            scData.File.update({
-                id: result.key,
-                entity: {
-                    id: result.value
-                }
-            });
-        });
-        $q.all(p).then(function() {
-            self.updateComplete = true;
-        });
-    }
 }]);

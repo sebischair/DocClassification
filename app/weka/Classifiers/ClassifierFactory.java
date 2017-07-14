@@ -1,5 +1,6 @@
 package weka.Classifiers;
 
+import util.StaticFunctions;
 import weka.classifiers.AbstractClassifier;
 
 /**
@@ -7,9 +8,19 @@ import weka.classifiers.AbstractClassifier;
  */
 public class ClassifierFactory {
 
-    public AbstractClassifier get() {
-        LibSVMClassifier libsvm = new LibSVMClassifier();
-        libsvm.init();
-        return libsvm.get();
+    public AbstractClassifier get(String classifierName) {
+        AbstractClassifier classifier;
+        switch (classifierName) {
+            case "NaiveBayes":
+                classifier = new NaiveBayesClassifier().get();
+                break;
+            default:
+                classifier = getDefaultClassifier();
+        }
+        return classifier;
+    }
+
+    public AbstractClassifier getDefaultClassifier() {
+        return new LibSVMClassifier().get();
     }
 }
