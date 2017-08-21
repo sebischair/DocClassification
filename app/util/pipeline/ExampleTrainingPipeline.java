@@ -64,6 +64,8 @@ public class ExampleTrainingPipeline extends TrainingPipeline {
         trainingData.setClassIndex(0);
 
         Map dataMap = getData(labels);
+        Logger.info("Received data from SC");
+
         dataMap.forEach((key, values) -> {
             ArrayList entities = (ArrayList) values;
             entities.forEach(e -> {
@@ -125,7 +127,7 @@ public class ExampleTrainingPipeline extends TrainingPipeline {
         Map map = new HashMap();
         List<String> miningAttributes = pipeline.getMiningAttributes();
         labels.forEach(label -> map.put(label.getName(), new ArrayList<String>()));
-
+        Logger.info("Getting data from SC");
         HelperService hs = new HelperService(ws);
         hs.entitiesForPath(labels.get(0).getPath() + "/entities").thenApply(entityObject -> {
             entityObject.forEach(entity -> {

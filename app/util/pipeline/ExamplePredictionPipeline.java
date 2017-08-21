@@ -62,7 +62,6 @@ public class ExamplePredictionPipeline extends PredictionPipeline {
         data.add(i);
 
         Logger.info("===== Instance created with reference dataset =====");
-        Logger.info(data.toString());
     }
 
     @Override
@@ -71,7 +70,7 @@ public class ExamplePredictionPipeline extends PredictionPipeline {
             double pred = classifier.classifyInstance(data.instance(0));
             Logger.info("===== Classified instance =====");
             Logger.info("Class predicted: " + data.classAttribute().value((int) pred));
-            return "Class predicted: " + pipeline.getLabels().get((int) pred).getName();
+            return pipeline.getLabels().get((int) pred).getName();
         } catch (Exception e) {
             Logger.info("Problem found when classifying the text");
         }
