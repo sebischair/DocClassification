@@ -1,6 +1,7 @@
 package services;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import play.Configuration;
 import play.libs.Json;
 import play.libs.ws.WSAuthScheme;
 import play.libs.ws.WSClient;
@@ -10,9 +11,11 @@ import java.util.concurrent.CompletionStage;
 
 public class HelperService {
     WSClient ws;
-    public static String SC_BASE_URL = "https://server.sociocortex.com/api/v1/";
-    public static String USER_NAME = "sociocortex.sebis@tum.de";
-    public static String PASSWORD = "ottto";
+
+    static Configuration configuration = Configuration.root();
+    public static String SC_BASE_URL = configuration.getString("sc.base.url");
+    public static String USER_NAME = configuration.getString("sc.userName");
+    public static String PASSWORD = configuration.getString("sc.password");
 
     public HelperService(WSClient ws) {
         this.ws = ws;
