@@ -20,10 +20,10 @@ public class LabelController extends Controller {
         JsonNode jo = request().body().asJson();
         String pipelineName = jo.get("pipelineName").asText();
         String labelName = jo.get("labelName").asText();
-        String labelPath = jo.get("labelPath").asText();
-        String labelId = jo.get("labelId").asText();
-        String labelType = jo.get("labelType").asText();
-        String label = jo.get("label").asText();
+        String labelPath = jo.has("labelPath") ? jo.get("labelPath").asText("") : "";
+        String labelId = jo.get("labelId").asText("");
+        String labelType = jo.get("labelType").asText("");
+        String label = jo.has("label") ? jo.get("label").asText("") : "";
 
         List<JsonNode> miningAttributes = jo.findValues("miningAttributes");
         ArrayList<String> attributes = new ArrayList<>();

@@ -39,6 +39,8 @@ public class Pipeline extends  PersistentEntity {
 
     private String tag;
 
+    private String filePath;
+
     public Pipeline() { }
 
     public Pipeline(String name, List<Label> labels, int split, List<String> stages, String model_path, Date created_at) {
@@ -54,6 +56,18 @@ public class Pipeline extends  PersistentEntity {
         try {
             Query<Pipeline> query = (Query<Pipeline>) MorphiaObject.datastore.createQuery(this.getClass()).field("name").equalIgnoreCase(pipelineName);
             UpdateOperations<Pipeline> ops = (UpdateOperations<Pipeline>) MorphiaObject.datastore.createUpdateOperations(this.getClass()).set("classifier", classifier);
+            MorphiaObject.datastore.update(query, ops);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean updateFilePath(String pipelineName, String filePath) {
+        try {
+            Query<Pipeline> query = (Query<Pipeline>) MorphiaObject.datastore.createQuery(this.getClass()).field("name").equalIgnoreCase(pipelineName);
+            UpdateOperations<Pipeline> ops = (UpdateOperations<Pipeline>) MorphiaObject.datastore.createUpdateOperations(this.getClass()).set("filePath", filePath);
             MorphiaObject.datastore.update(query, ops);
             return true;
         } catch (Exception e) {
@@ -187,5 +201,13 @@ public class Pipeline extends  PersistentEntity {
 
     public void setClassifier(String classifier) {
         this.classifier = classifier;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
     }
 }

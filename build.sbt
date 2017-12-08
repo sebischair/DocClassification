@@ -30,4 +30,6 @@ dependencyOverrides ++= Set(
   "com.fasterxml.jackson.core" % "jackson-databind" % "2.6.5"
 )
 
+unmanagedResourceDirectories in (Compile, runMain) <+=  baseDirectory ( _ /"../myresources")
+
 routesGenerator := InjectedRoutesGenerator

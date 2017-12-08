@@ -7,12 +7,14 @@ import model.Pipeline;
 import play.libs.Json;
 import play.libs.ws.WSClient;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 import services.HelperService;
 import util.StaticFunctions;
 import util.pipeline.ExamplePredictionPipeline;
 import util.pipeline.ExampleTrainingPipeline;
 
+import java.io.File;
 import java.util.Date;
 
 /**
@@ -124,5 +126,29 @@ public class PipelineController extends Controller {
         results.put("status", "OK");
         results.put("result", result);
         return StaticFunctions.jsonResult(ok(results));
+    }
+
+    public Result datasetUpload(){
+        Http.MultipartFormData<File> body = request().body().asMultipartFormData();
+        Http.MultipartFormData.FilePart<File> dataset = body.getFile("file");
+        if (dataset != null) {
+            String fileName = dataset.getFilename();
+            File file = dataset.getFile();
+            String newPath = "myresources/datasets/"+fileName;
+            file.renameTo(new File(newPath));
+            return ok(Json.parse("{ \"results\": { \"path\": \"" + newPath+ " \"}}"));
+        } else{
+            return ok();
+        }
+    }
+
+    public Result updatePipeline() {
+        ObjectNode results = Json.newObject();
+        String pipelineName = request().body().asJson().get("pipelineName").asText();
+        String fileName = request().body().asJson().get("fileName").asText();
+        String filePath = "myresources/datasets/" + fileName;
+        boolean result = new Pipeline().updateFilePath(pipelineName, filePath);
+        results.put("result", result);
+        return ok(results);
     }
 }

@@ -17,9 +17,7 @@ import weka.classifiers.AbstractClassifier;
 import weka.classifiers.Evaluation;
 import weka.core.*;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.util.*;
 
 import static play.mvc.Results.ok;
@@ -50,6 +48,7 @@ public class ExampleTrainingPipeline extends TrainingPipeline {
     public void load() {
         modelFileName = pipeline.getName();
         List<Label> labels = pipeline.getLabels();
+
         FastVector<String> fvNominalVal = new FastVector<>(labels.size());
         labels.forEach(label -> fvNominalVal.addElement(label.getName()));
 
@@ -123,31 +122,48 @@ public class ExampleTrainingPipeline extends TrainingPipeline {
 
     private Map getData(List<Label> labels) {
         Map map = new HashMap();
-        List<String> miningAttributes = pipeline.getMiningAttributes();
         labels.forEach(label -> map.put(label.getName(), new ArrayList<String>()));
 
-        HelperService hs = new HelperService(ws);
-        hs.entitiesForPath(labels.get(0).getPath() + "/entities").thenApply(entityObject -> {
-            entityObject.forEach(entity -> {
-                hs.entityForUid(entity.get("id").asText()).thenApply(e -> {
-                    JsonNode entityAttributes = e.get("attributes");
-                    String text = "";
-                    for (int j = 0; j < labels.size(); j++) {
-                        Label label = labels.get(j);
-                        if (StaticFunctions.tagValuesMatch(entityAttributes, pipeline.getTag(), label)) {
-                            for (String miningAttribute : miningAttributes) {
-                                String textValue = getStringValueFromSCObject(entityAttributes, miningAttribute);
-                                if (textValue != null) text += " " + textValue;
-                            }
-                            if (text != "") ((ArrayList) map.get(label.getName())).add(text.replaceAll("class", ""));
-                        }
+        if(pipeline.getFilePath() != null || pipeline.getFilePath() != "") {
+            try {
+                Scanner scanner = new Scanner(new File(pipeline.getFilePath()));
+                scanner.useDelimiter(",");
+                while(scanner.hasNext()) {
+                    List<String> line = StaticFunctions.parseLine(scanner.nextLine(), ',', '"');
+                    if(line.size() == 2) {
+                        String l = line.get(0);
+                        String t = line.get(1);
+                        if(l != null && l != "" && map.containsKey(l) && t != "") ((ArrayList) map.get(l)).add(t.replaceAll("class", ""));
                     }
-                    return ok();
-                }).toCompletableFuture().join();
-            });
-            return ok();
-        }).toCompletableFuture().join();
-
+                }
+                scanner.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        } else {
+            List<String> miningAttributes = pipeline.getMiningAttributes();
+            HelperService hs = new HelperService(ws);
+            hs.entitiesForPath(labels.get(0).getPath() + "/entities").thenApply(entityObject -> {
+                entityObject.forEach(entity -> {
+                    hs.entityForUid(entity.get("id").asText()).thenApply(e -> {
+                        JsonNode entityAttributes = e.get("attributes");
+                        String text = "";
+                        for (int j = 0; j < labels.size(); j++) {
+                            Label label = labels.get(j);
+                            if (StaticFunctions.tagValuesMatch(entityAttributes, pipeline.getTag(), label)) {
+                                for (String miningAttribute : miningAttributes) {
+                                    String textValue = getStringValueFromSCObject(entityAttributes, miningAttribute);
+                                    if (textValue != null) text += " " + textValue;
+                                }
+                                if (text != "") ((ArrayList) map.get(label.getName())).add(text.replaceAll("class", ""));
+                            }
+                        }
+                        return ok();
+                    }).toCompletableFuture().join();
+                });
+                return ok();
+            }).toCompletableFuture().join();
+        }
         return map;
     }
 }

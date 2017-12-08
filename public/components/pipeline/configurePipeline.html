@@ -4,12 +4,35 @@
             <h1>Pipeline: {{vm.pipeline.name}}</h1>
         </div>
         <div class="col-md-4" style="padding-top: 25px">
-            <button type="button" class="btn btn-primary" ng-click="vm.linkSC()" data-toggle="collapse"
+            <button type="button" class="btn btn-primary" data-toggle="collapse"
                     data-target="#selectWorkspace" aria-expanded="false" aria-controls="selectWorkspace">
                 Link SocioCortex workspace
             </button>
+            <button type="button" class="btn btn-primary" data-toggle="collapse"
+                    data-target="#showUpload" aria-expanded="false" aria-controls="showUpload">
+                Upload File
+            </button>
         </div>
     </div>
+
+    <div id="showUpload" class="collapse">
+        <div class="jumbotron row">
+            <div class="input-group col-md-12">
+                <input type="file"
+                       accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                       onChange="angular.element(this).scope().vm.onFileChange(this)">
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <br />
+                </div>
+            </div>
+            <div class="input-group">
+                <button type="button" class="btn btn-primary" ng-click="vm.uploadDataSetFile()">Upload</button>
+            </div>
+        </div>
+    </div>
+
     <div id="selectWorkspace" class="collapse">
         <div class="jumbotron">
             <div class="row">
@@ -120,8 +143,8 @@
                 <input type="text" class="form-control" ng-model="vm.labelName" required ng-trim="true"/>
 
                 <br/>
-                <label>Label path:</label>
-                <input type="text" class="form-control" ng-model="vm.labelPath" required ng-trim="true"/>
+                <!--<label>Label path:</label>
+                <input type="text" class="form-control" ng-model="vm.labelPath" required ng-trim="true"/>-->
             </div>
             <br/>
             <div>
@@ -146,18 +169,18 @@
         <table class="table">
             <tr>
                 <th>Label name</th>
-                <th>Directory path</th>
+                <!--<th>Directory path</th>-->
                 <th></th>
             </tr>
             <tr ng-repeat="label in vm.pipeline.labels">
                 <td>{{label.name}}</td>
-                <td>{{label.path}}</td>
+                <!--<td>{{label.path}}</td>-->
                 <td><span class="glyphicon glyphicon-remove" ng-click="vm.removeLabel(label)"></span></td>
             </tr>
         </table>
     </div>
 
-    <div ng-if="vm.pipeline.labels.length > 0">
+    <div ng-if="vm.pipeline.labels.length > 0 || vm.uploadedDocument">
         <hr/>
         <h4>Select a classifier</h4>
         <select name="classifierSelect" id="classifierSelect" ng-model="vm.classifier"
@@ -167,7 +190,7 @@
         </select>
     </div>
 
-    <div ng-if="vm.pipeline.labels.length > 0">
+    <div ng-if="vm.pipeline.labels.length > 0 || vm.uploadedDocument">
         <hr/>
         <button type="button" class="btn btn-primary" ng-click="vm.trainDocuments()">Train documents</button>
     </div>
@@ -175,6 +198,7 @@
     <div ng-if="vm.isTraining === true" class="jumbotron">
         Please wait! The system is training the ML model!
     </div>
+
     <div ng-if="vm.showResults === true" class="jumbotron">
         <h2>Prediction results on test data</h2>
         <div class="row">
