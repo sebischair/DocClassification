@@ -20,20 +20,21 @@ public class AmelieMongoClient {
         Configuration configuration = Configuration.root();
         String dbUrl = configuration.getString("morphia.db.url");
         int dbPort = configuration.getInt("morphia.db.port");
-        String userName = configuration.getString("morphia.db.username");
-        String password = configuration.getString("morphia.db.pwd");
         String dbName = configuration.getString("morphia.amelie.db.name");
 
         ServerAddress sa = new ServerAddress(dbUrl, dbPort);
-        MongoCredential credential = MongoCredential.createCredential(userName, dbName, password.toCharArray());
-        MongoClient mongoClient = new MongoClient(sa, Arrays.asList(credential));
-
         amelieMorphia = new Morphia();
         amelieMorphia.mapPackage("app.model.amelie");
+        MongoClient mongoClient;
 
         if (dbUrl.equals(dockerHost)) {
+            mongoClient = new MongoClient(sa);
             amelieDataStore = amelieMorphia.createDatastore(new MongoClient(sa), dbName);
         } else {
+            String userName = configuration.getString("morphia.db.username");
+            String password = configuration.getString("morphia.db.pwd");
+            MongoCredential credential = MongoCredential.createCredential(userName, dbName, password.toCharArray());
+            mongoClient = new MongoClient(sa, Arrays.asList(credential));
             amelieDataStore = amelieMorphia.createDatastore(mongoClient, dbName);
         }
 

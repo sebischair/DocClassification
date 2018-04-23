@@ -29,6 +29,15 @@ public class Issue {
         return issues;
     }
 
+    public ArrayNode findAllDesignDecisions() {
+        ArrayNode issues = Json.newArray();
+        MongoCursor<Document> cursor = issueCollection.find(new BasicDBObject("amelie.designDecision", true)).iterator();
+        while(cursor.hasNext()) {
+            issues.add(getIssueDetails(Json.toJson(cursor.next())));
+        }
+        return issues;
+    }
+
     private ObjectNode getIssueDetails(JsonNode obj) {
         ObjectNode issue = Json.newObject();
         issue.put("name", obj.get("name"));

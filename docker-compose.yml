@@ -1,14 +1,18 @@
 version: '3'
 services:
-  app:
+  docclassifier:
     tty: true
     build: ./
     ports:
-      - "9000:9000"
-      - "9999:9999"
-      - "8888:8888"
+      - "3005:3005"
     volumes:
-    - ".:/home/play/Code"
+    - ".:/home/sebis/projects/docclassifier"
+    depends_on:
+      - mongoforamelie
+    links:
+      - mongo:mongo
+  mongoforamelie:
+    image: 'sebischair/amelie:mongoforamelie'
     depends_on:
       - mongo
     links:
@@ -16,4 +20,4 @@ services:
   mongo:
     image: 'mongo:3.6.2'
     ports:
-        - 27017:27017
+      - 27017:27017

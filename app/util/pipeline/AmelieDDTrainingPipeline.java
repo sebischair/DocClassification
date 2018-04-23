@@ -28,7 +28,7 @@ public class AmelieDDTrainingPipeline extends TrainingPipeline {
         Map map = new HashMap();
         labels.forEach(label -> map.put(label.getName(), new ArrayList<String>()));
         Issue issueModel = new Issue();
-        ArrayNode issues = issueModel.findAllIssues();
+        ArrayNode issues = issueModel.findAllDesignDecisions();
         issues.forEach(issue -> {
             String l;
             if(modelFileName.toLowerCase().contains("category")) {
