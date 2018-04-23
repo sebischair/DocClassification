@@ -1,7 +1,7 @@
-import controllers.MorphiaObject;
+import db.AmelieMongoClient;
+import db.DefaultMongoClient;
 import model.Classifier;
 import play.Application;
-import play.Configuration;
 import play.GlobalSettings;
 import play.Logger;
 import util.StaticFunctions;
@@ -14,23 +14,14 @@ public class Global extends GlobalSettings {
     public void onStart(Application app) {
         super.beforeStart(app);
         Logger.debug("** onStart **");
-        Configuration configuration = Configuration.root();
         try {
-            MorphiaObject.connect(
-                    configuration.getString("morphia.db.url"),
-                    configuration.getInt("morphia.db.port"),
-                    configuration.getString("morphia.db.name"),
-                    configuration.getString("morphia.db.username"),
-                    configuration.getString("morphia.db.pwd")
-            );
-            Logger.debug("** Morphia datastore: " + MorphiaObject.datastore.getDB());
+            DefaultMongoClient.connect();
+            AmelieMongoClient.connect();
+            Logger.info("Application has started");
+            initDatabase();
         } catch (Exception e) {
-            Logger.error("** Morphia datastore: " + e.toString());
+            Logger.error("** Cannot connect to mongo: " + e.toString());
         }
-
-        Logger.debug("** Morphia datastore: " + MorphiaObject.datastore.getDB());
-        Logger.info("Application has started");
-        initDatabase();
     }
 
     private void initDatabase() {

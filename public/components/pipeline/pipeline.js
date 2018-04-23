@@ -90,13 +90,14 @@ pipelineApp.controller('ConfigurePipelineCtrl', ['scAuth', 'scData', 'scModel', 
     var self = this;
     self.pipeline = JSON.parse(pipeline.result);
     self.classifiers = JSON.parse(classifiers.result);
-    self.createLabelFlag = false;
+    self.createLabelFlag = true;
     self.workspace = "";
     self.classifier = "";
     self.isTraining = false;
-
+    self.fileName = "";
     self.typeCheckBox = null;
     self.pageCheckBox = null;
+    self.uploadedDocument = false;
 
     self.newLabel = function() {
         self.createLabelFlag = true;
@@ -111,9 +112,9 @@ pipelineApp.controller('ConfigurePipelineCtrl', ['scAuth', 'scData', 'scModel', 
     self.createLabel = function() {
         if(self.labelName === undefined || self.labelName.length == 0) {
             self.message = "Please provide a name!"
-        } else if (self.labelPath === undefined || self.labelPath.length == 0) {
+        } /*else if (self.labelPath === undefined || self.labelPath.length == 0) {
             self.message = "Please provide the path to a directory!"
-        } else {
+        }*/ else {
             for(var i in self.pipeline.labels) {
                 if(self.pipeline.labels[i].name === self.labelName) {
                     self.message = "Please use a different name! Label already exists";
@@ -133,7 +134,6 @@ pipelineApp.controller('ConfigurePipelineCtrl', ['scAuth', 'scData', 'scModel', 
                 self.pipeline = JSON.parse(response.data.result);
                 self.labelName = "";
                 self.labelPath = "";
-                self.createLabelFlag = false;
             });
         }
     };
@@ -276,4 +276,31 @@ pipelineApp.controller('ConfigurePipelineCtrl', ['scAuth', 'scData', 'scModel', 
                 subscription.checked = false;
         });
     };
+
+    self.uploadDataSetFile = function () {
+        var fd = new FormData();
+        fd.append("file", self.file);
+        fd.append("pipelineName", self.pipeline.name);
+        $http.post("/pipeline/dataset/upload", fd, {
+            headers: {'Content-Type': undefined}
+        }).then(function (response) {
+            self.dataset = response.data.results.path;
+            self.uploadedDocument = true;
+            self.updateFilePath();
+        });
+    };
+
+    self.updateFilePath = function() {
+        var data = {};
+        data.pipelineName = self.pipeline.name;
+        data.fileName = self.fileName;
+        $http.post('/pipeline/updatePipeline', data);
+    }
+
+    self.onFileChange = function (ele) {
+        var files = ele.files;
+        self.file = files[0];
+        self.fileName = self.file.name;
+    };
+
 }]);

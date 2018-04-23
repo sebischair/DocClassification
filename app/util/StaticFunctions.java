@@ -3,7 +3,7 @@ package util;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.mongodb.DBObject;
 import com.mongodb.util.JSON;
-import controllers.MorphiaObject;
+import db.DefaultMongoClient;
 import model.Label;
 import model.Pipeline;
 import play.mvc.Result;
@@ -16,12 +16,7 @@ import java.util.*;
 public class StaticFunctions {
     public static String LIBSVM = "LibSVM";
     public static String NAIVEBAYES = "NaiveBayes";
-    public static String LABEL = "label";
-    public static String TEXT = "text";
-    public static String FEATURES = "features";
-    public static String WORDS = "words";
-    public static String[] STOPWORDS = {"a", "an", "and", "the", "that", "they", "which", "we", "us", "i", "me", "like", "that", "only", "much", "kafka", "it", "is", "if", "by", "basically", "are", "as", "but", "those", "spark", "also"};
-    public static final Set<String> STOPWORDS_SET = new HashSet<String>(Arrays.asList(STOPWORDS));
+    public static String[] STOPWORDS = {"a", "an", "and", "the", "that", "they", "which", "we", "us", "i", "me", "like", "that", "only", "much", "it", "is", "if", "by", "basically", "are", "as", "but", "those", "also"};
 
     public static boolean tagValuesMatch(JsonNode entityAttributes, String tag, Label label) {
         if(entityAttributes == null) return false;
@@ -60,7 +55,7 @@ public class StaticFunctions {
         List<DBObject> dbObjList = new ArrayList<>(objList.size());
         DBObject dbObj;
         for (Object obj : objList) {
-            dbObj = MorphiaObject.morphia.toDBObject(obj);
+            dbObj = DefaultMongoClient.morphia.toDBObject(obj);
             for (String removeAttribute : removeAttributes) {
                 dbObj.removeField(removeAttribute);
             }
@@ -71,7 +66,7 @@ public class StaticFunctions {
 
     public static String deserializeToJSON(Object obj, String... removeAttributes) {
         DBObject dbObj;
-        dbObj = MorphiaObject.morphia.toDBObject(obj);
+        dbObj = DefaultMongoClient.morphia.toDBObject(obj);
         for (String removeAttribute : removeAttributes) {
             dbObj.removeField(removeAttribute);
         }
@@ -91,6 +86,70 @@ public class StaticFunctions {
         for (String s : STOPWORDS) {
             text = text.replaceAll("\\b" + s + "\\b", "");
         }
-        return text.replaceAll("[()]", "method");
+        return text.replaceAll("[()]", " method ");
+    }
+
+    public static List<String> parseLine(String cvsLine, char separators, char customQuote) {
+        List<String> result = new ArrayList<>();
+        //if empty, return!
+        if (cvsLine == null && cvsLine.isEmpty()) {
+            return result;
+        }
+        if (customQuote == ' ') {
+            customQuote = '"';
+        }
+        if (separators == ' ') {
+            separators = ',';
+        }
+        StringBuffer curVal = new StringBuffer();
+        boolean inQuotes = false;
+        boolean startCollectChar = false;
+        boolean doubleQuotesInColumn = false;
+        char[] chars = cvsLine.toCharArray();
+        for (char ch : chars) {
+            if (inQuotes) {
+                startCollectChar = true;
+                if (ch == customQuote) {
+                    inQuotes = false;
+                    doubleQuotesInColumn = false;
+                } else {
+                    //Fixed : allow "" in custom quote enclosed
+                    if (ch == '\"') {
+                        if (!doubleQuotesInColumn) {
+                            curVal.append(ch);
+                            doubleQuotesInColumn = true;
+                        }
+                    } else {
+                        curVal.append(ch);
+                    }
+                }
+            } else {
+                if (ch == customQuote) {
+                    inQuotes = true;
+                    //Fixed : allow "" in empty quote enclosed
+                    if (chars[0] != '"' && customQuote == '\"') {
+                        curVal.append('"');
+                    }
+                    //double quotes in column will hit this!
+                    if (startCollectChar) {
+                        curVal.append('"');
+                    }
+                } else if (ch == separators) {
+                    result.add(curVal.toString());
+                    curVal = new StringBuffer();
+                    startCollectChar = false;
+                } else if (ch == '\r') {
+                    //ignore LF characters
+                    continue;
+                } else if (ch == '\n') {
+                    //the end, break!
+                    break;
+                } else {
+                    curVal.append(ch);
+                }
+            }
+        }
+        result.add(curVal.toString());
+        return result;
     }
 }

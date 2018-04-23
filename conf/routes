@@ -10,7 +10,8 @@ GET     /pipeline/train                 controllers.PipelineController.train(nam
 POST    /pipeline/predict               controllers.PipelineController.predict
 POST    /pipeline/predictAndClassify    controllers.PipelineController.predictAndClassify
 POST    /pipeline/classifier            controllers.PipelineController.setClassifier
-
+POST    /pipeline/dataset/upload        controllers.PipelineController.datasetUpload
+POST    /pipeline/updatePipeline        controllers.PipelineController.updatePipeline
 
 GET     /pipeline/create                controllers.PipelineController.create(name: String ?= "")
 GET     /pipeline/remove                controllers.PipelineController.remove(name: String ?= "")

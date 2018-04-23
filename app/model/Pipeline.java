@@ -1,6 +1,6 @@
 package model;
 
-import controllers.MorphiaObject;
+import db.DefaultMongoClient;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.*;
 import org.mongodb.morphia.query.Query;
@@ -39,6 +39,8 @@ public class Pipeline extends  PersistentEntity {
 
     private String tag;
 
+    private String filePath;
+
     public Pipeline() { }
 
     public Pipeline(String name, List<Label> labels, int split, List<String> stages, String model_path, Date created_at) {
@@ -52,9 +54,21 @@ public class Pipeline extends  PersistentEntity {
 
     public boolean updateClassifier(String pipelineName, String classifier) {
         try {
-            Query<Pipeline> query = (Query<Pipeline>) MorphiaObject.datastore.createQuery(this.getClass()).field("name").equalIgnoreCase(pipelineName);
-            UpdateOperations<Pipeline> ops = (UpdateOperations<Pipeline>) MorphiaObject.datastore.createUpdateOperations(this.getClass()).set("classifier", classifier);
-            MorphiaObject.datastore.update(query, ops);
+            Query<Pipeline> query = (Query<Pipeline>) DefaultMongoClient.datastore.createQuery(this.getClass()).field("name").equalIgnoreCase(pipelineName);
+            UpdateOperations<Pipeline> ops = (UpdateOperations<Pipeline>) DefaultMongoClient.datastore.createUpdateOperations(this.getClass()).set("classifier", classifier);
+            DefaultMongoClient.datastore.update(query, ops);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean updateFilePath(String pipelineName, String filePath) {
+        try {
+            Query<Pipeline> query = (Query<Pipeline>) DefaultMongoClient.datastore.createQuery(this.getClass()).field("name").equalIgnoreCase(pipelineName);
+            UpdateOperations<Pipeline> ops = (UpdateOperations<Pipeline>) DefaultMongoClient.datastore.createUpdateOperations(this.getClass()).set("filePath", filePath);
+            DefaultMongoClient.datastore.update(query, ops);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -64,9 +78,9 @@ public class Pipeline extends  PersistentEntity {
 
     public boolean updateModelPath(String pipelineName, String modelPath) {
         try {
-            Query<Pipeline> query = (Query<Pipeline>) MorphiaObject.datastore.createQuery(this.getClass()).field("name").equalIgnoreCase(pipelineName);
-            UpdateOperations<Pipeline> ops = (UpdateOperations<Pipeline>) MorphiaObject.datastore.createUpdateOperations(this.getClass()).set("modelPath", modelPath);
-            MorphiaObject.datastore.update(query, ops);
+            Query<Pipeline> query = (Query<Pipeline>) DefaultMongoClient.datastore.createQuery(this.getClass()).field("name").equalIgnoreCase(pipelineName);
+            UpdateOperations<Pipeline> ops = (UpdateOperations<Pipeline>) DefaultMongoClient.datastore.createUpdateOperations(this.getClass()).set("modelPath", modelPath);
+            DefaultMongoClient.datastore.update(query, ops);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -77,9 +91,9 @@ public class Pipeline extends  PersistentEntity {
     public boolean addNewLabel(String pipelineName, String labelName, String labelPath, String labelId, String labelType) {
         try {
             Label label = new Label(labelName, labelPath, labelId, labelType);
-            Query<Pipeline> query = (Query<Pipeline>) MorphiaObject.datastore.createQuery(this.getClass()).field("name").equalIgnoreCase(pipelineName);
-            UpdateOperations<Pipeline> ops = (UpdateOperations<Pipeline>) MorphiaObject.datastore.createUpdateOperations(this.getClass()).add("labels", label, false);
-            MorphiaObject.datastore.update(query, ops);
+            Query<Pipeline> query = (Query<Pipeline>) DefaultMongoClient.datastore.createQuery(this.getClass()).field("name").equalIgnoreCase(pipelineName);
+            UpdateOperations<Pipeline> ops = (UpdateOperations<Pipeline>) DefaultMongoClient.datastore.createUpdateOperations(this.getClass()).add("labels", label, false);
+            DefaultMongoClient.datastore.update(query, ops);
             return true;
         } catch (Exception exp) {
             exp.printStackTrace();
@@ -90,9 +104,9 @@ public class Pipeline extends  PersistentEntity {
     public boolean removeLabel(String pipelineName, String labelName, String labelPath, String labelId, String labelType) {
         try {
             Label label = new Label(labelName, labelPath, labelId, labelType);
-            Query<Pipeline> query = (Query<Pipeline>) MorphiaObject.datastore.createQuery(this.getClass()).field("name").equalIgnoreCase(pipelineName);
-            UpdateOperations<Pipeline> ops = (UpdateOperations<Pipeline>) MorphiaObject.datastore.createUpdateOperations(this.getClass()).removeAll("labels", label);
-            MorphiaObject.datastore.update(query, ops);
+            Query<Pipeline> query = (Query<Pipeline>) DefaultMongoClient.datastore.createQuery(this.getClass()).field("name").equalIgnoreCase(pipelineName);
+            UpdateOperations<Pipeline> ops = (UpdateOperations<Pipeline>) DefaultMongoClient.datastore.createUpdateOperations(this.getClass()).removeAll("labels", label);
+            DefaultMongoClient.datastore.update(query, ops);
             return true;
         } catch (Exception exp) {
             exp.printStackTrace();
@@ -102,9 +116,9 @@ public class Pipeline extends  PersistentEntity {
 
     public boolean updateMiningAttributes(String pipelineName, ArrayList<String> miningAttributes) {
         try {
-            Query<Pipeline> query = (Query<Pipeline>) MorphiaObject.datastore.createQuery(this.getClass()).field("name").equalIgnoreCase(pipelineName);
-            UpdateOperations<Pipeline> ops = (UpdateOperations<Pipeline>) MorphiaObject.datastore.createUpdateOperations(this.getClass()).set("miningAttributes", miningAttributes);
-            MorphiaObject.datastore.update(query, ops);
+            Query<Pipeline> query = (Query<Pipeline>) DefaultMongoClient.datastore.createQuery(this.getClass()).field("name").equalIgnoreCase(pipelineName);
+            UpdateOperations<Pipeline> ops = (UpdateOperations<Pipeline>) DefaultMongoClient.datastore.createUpdateOperations(this.getClass()).set("miningAttributes", miningAttributes);
+            DefaultMongoClient.datastore.update(query, ops);
             return true;
         } catch (Exception exp) {
             exp.printStackTrace();
@@ -114,9 +128,9 @@ public class Pipeline extends  PersistentEntity {
 
     public boolean updateLabel(String pipelineName, String tag) {
         try {
-            Query<Pipeline> query = (Query<Pipeline>) MorphiaObject.datastore.createQuery(this.getClass()).field("name").equalIgnoreCase(pipelineName);
-            UpdateOperations<Pipeline> ops = (UpdateOperations<Pipeline>) MorphiaObject.datastore.createUpdateOperations(this.getClass()).set("tag", tag);
-            MorphiaObject.datastore.update(query, ops);
+            Query<Pipeline> query = (Query<Pipeline>) DefaultMongoClient.datastore.createQuery(this.getClass()).field("name").equalIgnoreCase(pipelineName);
+            UpdateOperations<Pipeline> ops = (UpdateOperations<Pipeline>) DefaultMongoClient.datastore.createUpdateOperations(this.getClass()).set("tag", tag);
+            DefaultMongoClient.datastore.update(query, ops);
             return true;
         } catch (Exception exp) {
             exp.printStackTrace();
@@ -187,5 +201,13 @@ public class Pipeline extends  PersistentEntity {
 
     public void setClassifier(String classifier) {
         this.classifier = classifier;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
     }
 }
