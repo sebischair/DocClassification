@@ -2,7 +2,7 @@ package model;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import controllers.MorphiaObject;
+import db.DefaultMongoClient;
 import org.mongodb.morphia.query.Query;
 
 import java.util.List;
@@ -13,21 +13,21 @@ import java.util.List;
 public class PersistentEntity {
 
     public void save() {
-        MorphiaObject.datastore.save(this);
+        DefaultMongoClient.datastore.save(this);
     }
 
     public void delete() {
-        MorphiaObject.datastore.delete(this);
+        DefaultMongoClient.datastore.delete(this);
     }
 
     public PersistentEntity findByName(String fieldName, String fieldValue) {
-        List<? extends PersistentEntity> entities = MorphiaObject.datastore.createQuery(this.getClass()).field(fieldName).equalIgnoreCase(fieldValue).asList();
+        List<? extends PersistentEntity> entities = DefaultMongoClient.datastore.createQuery(this.getClass()).field(fieldName).equalIgnoreCase(fieldValue).asList();
         if(entities.size() > 0) return entities.get(0);
         return null;
     }
 
     public List<? extends PersistentEntity> getAll() {
-        final Query<? extends PersistentEntity> query = MorphiaObject.datastore.createQuery(this.getClass());
+        final Query<? extends PersistentEntity> query = DefaultMongoClient.datastore.createQuery(this.getClass());
         return query.asList();
     }
 

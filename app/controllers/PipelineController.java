@@ -11,6 +11,7 @@ import play.mvc.Http;
 import play.mvc.Result;
 import services.HelperService;
 import util.StaticFunctions;
+import util.pipeline.AmelieDDTrainingPipeline;
 import util.pipeline.ExamplePredictionPipeline;
 import util.pipeline.ExampleTrainingPipeline;
 
@@ -87,7 +88,7 @@ public class PipelineController extends Controller {
     public Result train(String pipelineName) {
         ObjectNode results = Json.newObject();
         Pipeline pipeline = StaticFunctions.getPipeline(pipelineName);
-        ObjectNode result = new ExampleTrainingPipeline(ws).run(pipeline);
+        ObjectNode result = new AmelieDDTrainingPipeline().run(pipeline);
         results.put("status", "OK");
         results.put("result", result);
         return ok(results);
