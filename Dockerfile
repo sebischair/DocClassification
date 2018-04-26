@@ -44,14 +44,22 @@ ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
 ENV PATH=$PATH:/opt/activator/bin
 RUN echo "export PATH=$PATH:/opt/activator/bin" >> /home/sebis/.bashrc
 #Based on https://github.com/cmoro-deusto/docker-play/issues/4
-# Define user home. Activator will store ivy2 and sbt caches on /home/play/Code volume
-RUN echo "export _JAVA_OPTIONS='-Duser.home=/home/sebis/projects/docclassifier'" >> /home/sebis/.bashrc
+# Define user home. Activator will store ivy2 and sbt caches on /home/sebis/projects/docclassifier/ volume
+RUN echo "export _JAVA_OPTIONS='-Duser.home=/home/sebis/projects/docclassifier/'" >> /home/sebis/.bashrc
 
 # Change user, launch bash
 USER sebis
 WORKDIR /home/sebis/projects/docclassifier
-CMD ["activator", "run -Dhttp.port=3005"]
+RUN mkdir -p /home/sebis/projects/docclassifier/dist && \
+    chown -R sebis:sebis /home/sebis/projects/docclassifier/dist && \
+    cd /home/sebis/projects/docclassifier/dist
+
+COPY dist/docclassification-1.0.zip docclassification-1.0.zip
+
+RUN unzip docclassification-1.0.zip -d /home/sebis/projects/docclassifier/dist/ && \
+    chmod +x /home/sebis/projects/docclassifier/dist/docclassification-1.0/bin/docclassification
+
+CMD ["/home/sebis/projects/docclassifier/dist/docclassification-1.0/bin/docclassification", "-Dhttp.port=3005"]
 
 # Expose Code volume and play ports 9000 default 9999 debug 8888 activator ui
-VOLUME "/home/sebis/projects/docclassifier"
 EXPOSE 3005
