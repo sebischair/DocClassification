@@ -10,7 +10,6 @@ lazy val webJarsPlay = file("..").getAbsoluteFile.toURI
 
 libraryDependencies ++= Seq(
   filters,
-  javaJdbc,
   cache,
   javaWs,
   "org.webjars" %% "webjars-play" % "2.5.0",

@@ -21,13 +21,14 @@ public class AmelieMongoClient {
         String dbUrl = configuration.getString("morphia.db.url");
         int dbPort = configuration.getInt("morphia.db.port");
         String dbName = configuration.getString("morphia.amelie.db.name");
+        boolean isAuthEnabled = configuration.getBoolean("morphia.db.isAuthEnabled");
 
         ServerAddress sa = new ServerAddress(dbUrl, dbPort);
         amelieMorphia = new Morphia();
         amelieMorphia.mapPackage("app.model.amelie");
         MongoClient mongoClient;
 
-        if (dbUrl.equals(dockerHost)) {
+        if (dbUrl.equals(dockerHost) || !isAuthEnabled) {
             mongoClient = new MongoClient(sa);
             amelieDataStore = amelieMorphia.createDatastore(new MongoClient(sa), dbName);
         } else {

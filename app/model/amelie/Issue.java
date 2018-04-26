@@ -31,7 +31,7 @@ public class Issue {
 
     public ArrayNode findAllDesignDecisions() {
         ArrayNode issues = Json.newArray();
-        MongoCursor<Document> cursor = issueCollection.find(new BasicDBObject("amelie.designDecision", true)).iterator();
+        MongoCursor<Document> cursor = issueCollection.find(new BasicDBObject("amelie.designDecision", new BasicDBObject("$exists", true))).iterator();
         while(cursor.hasNext()) {
             issues.add(getIssueDetails(Json.toJson(cursor.next())));
         }
