@@ -1,0 +1,51 @@
+{
+	"variables": [],
+	"info": {
+		"name": "DocClassification",
+		"_postman_id": "85308618-44f3-8e28-d037-dfbbd8f7f2e0",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Predict decision category",
+			"request": {
+				"url": "http://localhost:9000/pipeline/predict",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"pipelineName\": \"DecisionCategory\",\n  \"textToClassify\": \"Move hash expressions from miscscala into hashscala hashscala was getting pretty long and its not obvious that hash expressions belong there Creating a hashscala to put all the hash expressions\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Predict design decisions",
+			"request": {
+				"url": "http://localhost:9000/pipeline/predict",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"pipelineName\": \"DesignDecisions\",\n  \"textToClassify\": \"Move hash expressions from miscscala into hashscala hashscala was getting pretty long and its not obvious that hash expressions belong there Creating a hashscala to put all the hash expressions\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}
