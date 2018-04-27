@@ -27,13 +27,8 @@ or use run.bat
 Application will be available at localhost:9000
 
 ## Docker support
-1. Change the database configurations according to the instructions in `application.conf`
-1. Start the complete application stack using `docker-compose up`
-
-Notice: the current docker uses a mongoDB image without any data. This will be dealt with in the future work.
-
-# Note
-The documents are retrieved from server.sociocortex.com
+1. Change the database configurations according to the instructions in `application.local.conf.back`
+2. Start the application stack using `docker-compose up`
 
 ## Creating a training pipeline
 1. Click on Training tab
