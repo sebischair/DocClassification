@@ -6,9 +6,9 @@ User interface support for
     + Training documents
     + Classifying documents
     
-API support for Classifying documents
+API support for Classifying documents - <a href="https://documenter.getpostman.com/view/693941/collection/RW1aKg3Z" target="_blank">Documentation</a>
 
-[![Run in Postman](https://run.pstmn.io/button.svg)](https://documenter.getpostman.com/view/693941/collection/RW1aKg3Z)
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/b608adb9766710441ec2)
 
 
 ## Runtime dependencies:
