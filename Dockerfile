@@ -16,8 +16,7 @@ COPY dist/docclassification-1.0.zip ${PROJECT_HOME}/docclassification-1.0.zip
 
 RUN cd ${PROJECT_HOME} && \
     unzip docclassification-1.0.zip && \
-    chmod +x ${PROJECT_HOME}/docclassification-1.0/bin/docclassification && \
-    cd ${PROJECT_HOME}/docclassification-1.0/bin
+    chmod +x ${PROJECT_HOME}/docclassification-1.0/bin/docclassification
 
 CMD ["/usr/src/docclassification-1.0/bin/docclassification", "-Dhttp.port=3005"]
 
