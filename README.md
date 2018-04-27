@@ -5,6 +5,11 @@ User interface support for
     + Creating new labels
     + Training documents
     + Classifying documents
+    
+API support for Classifying documents
+
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://documenter.getpostman.com/view/693941/collection/RW1aKg3Z)
+
 
 ## Runtime dependencies:
 JDK - 1.8.0
