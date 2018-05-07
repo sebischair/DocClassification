@@ -5,8 +5,8 @@ User interface support for
     + Creating new labels
     + Training documents
     + Classifying documents
-    
-API support for Classifying documents - <a href="https://documenter.getpostman.com/view/693941/collection/RW1aKg3Z" target="_blank">Documentation</a>
+
+API support for Classifying documents - <a href="https://documenter.getpostman.com/view/693941/collection/RW1aKg3Z" target="_blank">API Documentation</a>
 
 [![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/b608adb9766710441ec2)
 
@@ -35,35 +35,5 @@ Application will be available at localhost:9000
 1. Change the database configurations according to the instructions in `application.local.conf.back`
 2. Start the application stack using `docker-compose up`
 
-## Creating a training pipeline
-1. Click on Training tab
-2. Add a new pipeline and save it
-3. Click on the newly created pipeline
-4. Click on Link to SocioCortex workspace button
-5. Select Amelie Workspace from the dropdown list
-6. Click on Type checkbox
-7. Select Types: Check Task
-8. Select attributes for mining: Check Summary and Description
-9. Select an attribute for labeling: Check design decision
-10. Select attribute values as labels: Check both 0 and 1
-11. Click on update labels button
-
-12. Once the labels are created, select the classifier (for e.g., LibSVM)
-13. Click on Train documents button
-
-## Classifying documents
-1. Select the pipeline
-2. Input the text in the text area
-3. Click on Classify documents button
-
-One can POST a request to localhost:9000/pipeline/predict
-with a JSON body:
-{
- "pipelineName": "Decision detection",
- "textToClassify": "input text"
-}
-Response:
-{
- "status": "OK"
- "result": "label"
-}
+## How to use DocClassification
+To find out how to use DocClassification, please checkout out the <a href="https://github.com/sebischair/DocClassification/wiki" target="_blank">DocClassification wiki</a>.
