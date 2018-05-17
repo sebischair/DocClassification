@@ -1,0 +1,68 @@
+{
+	"info": {
+		"_postman_id": "a1ccb121-b9a3-4ac5-bf6f-8455acb64eb8",
+		"name": "DocClassification",
+		"description": "DocClassification is a seed project for document classification.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Predict decision category",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"pipelineName\": \"DecisionCategory\",\n  \"textToClassify\": \"Move hash expressions from miscscala into hashscala hashscala was getting pretty long and its not obvious that hash expressions belong there Creating a hashscala to put all the hash expressions\"\n}"
+				},
+				"url": {
+					"raw": "{{SERVER_URL}}/pipeline/predict",
+					"host": [
+						"{{SERVER_URL}}"
+					],
+					"path": [
+						"pipeline",
+						"predict"
+					]
+				},
+				"description": "This endpoint is used to classify a document. Different pipelines can be used for different classifying purposes.\n\nThe request body contains `pipelineName` and `textToClassify`. In this example, we can classify the decision category.\n\n// TODO: create response example. I don't know how to create pipeline `DecisionCategory`."
+			},
+			"response": []
+		},
+		{
+			"name": "Predict design decisions",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"pipelineName\": \"DesignDecisions\",\n  \"textToClassify\": \"Move hash expressions from miscscala into hashscala hashscala was getting pretty long and its not obvious that hash expressions belong there Creating a hashscala to put all the hash expressions\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:9000/pipeline/predict",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9000",
+					"path": [
+						"pipeline",
+						"predict"
+					]
+				},
+				"description": "This endpoint is used to classify a document. Different pipelines can be used for different classifying purposes.\n\nThe request body contains `pipelineName` and `textToClassify`. In this example, we can xxxxxx.  //TODO: what does this pipeline do?\n\n// TODO: create response example. I don't know how to create pipeline `designDecisions`."
+			},
+			"response": []
+		}
+	]
+}
