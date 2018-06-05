@@ -29,6 +29,9 @@ dependencyOverrides ++= Set(
   "com.fasterxml.jackson.core" % "jackson-databind" % "2.6.5"
 )
 
-unmanagedResourceDirectories in (Compile, runMain) <+=  baseDirectory ( _ /"../myresources")
+unmanagedResourceDirectories in (Compile, runMain) <+=  baseDirectory ( _ /"myresources")
+
+import com.typesafe.sbt.packager.MappingsHelper._
+  mappings in Universal ++= directory(baseDirectory.value / "myresources")
 
 routesGenerator := InjectedRoutesGenerator

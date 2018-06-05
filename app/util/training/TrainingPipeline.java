@@ -98,7 +98,7 @@ public abstract class TrainingPipeline {
 
     public void save() {
         try {
-            ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(Play.application().getFile("/public/" + modelFileName)));
+            ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(Play.application().getFile("myresources/" + modelFileName)));
             out.writeObject(wfc.getFC());
             out.close();
             Logger.info("===== Saved model: " + modelFileName + " =====");

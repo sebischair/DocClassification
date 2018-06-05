@@ -18,6 +18,9 @@ RUN cd ${PROJECT_HOME} && \
     unzip docclassification-1.0.zip && \
     chmod +x ${PROJECT_HOME}/docclassification-1.0/bin/docclassification
 
+RUN mkdir -p /usr/src/docclassification-1.0/myresources
+COPY myresources /usr/src/akre-1.0/myresources
+
 CMD ["/usr/src/docclassification-1.0/bin/docclassification", "-Dhttp.port=3005"]
 
 # Expose Code volume and play ports 9000 default 9999 debug 8888 activator ui

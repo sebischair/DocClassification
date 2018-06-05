@@ -7,10 +7,7 @@ import util.prediction.PredictionPipeline;
 import weka.classifiers.AbstractClassifier;
 import weka.core.*;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.ObjectInputStream;
+import java.io.*;
 import java.util.List;
 
 /**
@@ -21,8 +18,8 @@ public class ExamplePredictionPipeline extends PredictionPipeline {
     @Override
     public void loadModel() {
         try {
-            ObjectInputStream in = new ObjectInputStream(new FileInputStream(Play.application().getFile("/public/" + pipeline.getName())));
-            Logger.info("Try to load model... from " + Play.application().getFile("/public/" + pipeline.getName()));
+            ObjectInputStream in = new ObjectInputStream(new FileInputStream(Play.application().getFile("myresources/" + pipeline.getName())));
+            Logger.info("Try to load model... from " + Play.application().getFile("myresources/" + pipeline.getName()));
             long startTime = System.currentTimeMillis();
             Object obj = in.readObject();
             Logger.info("Load model done. " + (System.currentTimeMillis() - startTime) / 1000 + "s");
@@ -32,7 +29,7 @@ public class ExamplePredictionPipeline extends PredictionPipeline {
                 classifier = (AbstractClassifier) obj;
             }
         } catch (FileNotFoundException e1) {
-            Logger.error("Warning: File not found, retrain model...");
+            Logger.error("Warning: File not found, retrain model..." + e1.getMessage());
         } catch (ClassNotFoundException e) {
             Logger.error("Class not found, retrain model...");
         } catch (IOException e) {
