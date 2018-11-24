@@ -1,6 +1,5 @@
 package weka.Classifiers;
 
-import util.StaticFunctions;
 import weka.classifiers.AbstractClassifier;
 
 /**

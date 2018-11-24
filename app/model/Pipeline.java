@@ -27,8 +27,6 @@ public class Pipeline extends  PersistentEntity {
 
     private String classifier;
 
-    private List<String> stages;
-
     private List<String> miningAttributes;
 
     private int split;
@@ -47,7 +45,6 @@ public class Pipeline extends  PersistentEntity {
         this.name = name;
         this.labels = labels;
         this.split = split;
-        this.stages = stages;
         this.modelPath = model_path;
         this.createdAt = created_at;
     }
